@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../firebase_auth_implementation/firebase_auth_services.dart';
+import 'loginScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -8,7 +12,24 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
+  bool _isSigningUp = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,19 +64,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 30),
                 const Text('Username', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
-                _inputField(hint: 'Enter your username'),
+                _inputField(
+                  hint: 'Enter your username',
+                  controller: _usernameController,
+                ),
                 const SizedBox(height: 16),
                 const Text('Email', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
-                _inputField(hint: 'example@gmail.com'),
+                _inputField(
+                  hint: 'example@gmail.com',
+                  controller: _emailController,
+                ),
                 const SizedBox(height: 16),
                 const Text('Phone', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
-                _inputField(hint: 'Enter your phone', keyboardType: TextInputType.phone),
+                _inputField(
+                  hint: 'Enter your phone',
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneController,
+                ),
                 const SizedBox(height: 16),
                 const Text('Password', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Enter your Password',
@@ -89,9 +121,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
-                    },
-                    child: const Text(
+                    onPressed: _signUp,
+                    child: _isSigningUp
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
                       'Signup',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
@@ -139,8 +172,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-  Widget _inputField({required String hint, TextInputType keyboardType = TextInputType.text}) {
+
+  Widget _inputField({
+    required String hint,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return TextField(
+      controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hint,
@@ -153,5 +192,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  void _signUp() async {
+    setState(() {
+      _isSigningUp = true;
+    });
+
+    String username = _usernameController.text.trim();
+    String email = _emailController.text.trim();
+    String phone = _phoneController.text.trim();
+    String password = _passwordController.text.trim();
+
+    final user = await _auth.signUpWithEmailAndPassword(email, password);
+
+    setState(() {
+      _isSigningUp = false;
+    });
+
+    if (user != null) {
+      SnackBar(content: Text("Registration successful!"));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } else {
+      SnackBar(content: Text("Registration failed. Try again."));
+    }
   }
 }
