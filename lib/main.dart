@@ -1,7 +1,7 @@
 import 'package:finance_track/providers/homeProvider.dart';
 import 'package:finance_track/providers/loginProvider.dart';
 import 'package:finance_track/providers/registerProvider.dart';
-import 'package:finance_track/screens/loginScreen.dart';
+import 'package:finance_track/screens/splashScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Finance Tracker',
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: SplashScreen(),
     );
   }
 }

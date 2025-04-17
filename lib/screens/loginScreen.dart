@@ -1,7 +1,8 @@
-import 'package:finance_track/screens/homeScreen.dart';
-import 'package:finance_track/screens/registerScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../firebase_auth_implementation/firebase_auth_services.dart';
+import 'homeScreen.dart';
+import 'registerScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -12,7 +13,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuthService _auth = FirebaseAuthService();
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -41,10 +41,15 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (user != null) {
+      // Save session info
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setInt('loginTimestamp', DateTime.now().millisecondsSinceEpoch);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Sign in successful!")),
       );
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
@@ -125,8 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                    },
+                    onPressed: () {},
                     child: const Text(
                       'Forgot your password?',
                       style: TextStyle(color: Colors.white, fontSize: 14),
