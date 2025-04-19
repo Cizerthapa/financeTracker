@@ -1,6 +1,8 @@
 import 'package:finance_track/providers/homeProvider.dart';
 import 'package:finance_track/providers/loginProvider.dart';
+import 'package:finance_track/providers/profile_provider.dart';
 import 'package:finance_track/providers/registerProvider.dart';
+import 'package:finance_track/providers/theme_provider.dart';
 import 'package:finance_track/screens/splashScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +46,8 @@ class RootApp extends StatelessWidget {
               ChangeNotifierProvider(create: (_) => loginProvider()),
               ChangeNotifierProvider(create: (_) => RegisterProvider()),
               ChangeNotifierProvider(create: (_) => HomeProvider()),
+              ChangeNotifierProvider(create: (_) => ProfileProvider()),
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
             ],
             child: const MyApp(),
           );
