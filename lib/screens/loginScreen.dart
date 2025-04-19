@@ -1,5 +1,8 @@
-import 'package:finance_track/screens/registerScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../firebase_auth_implementation/firebase_auth_services.dart';
+import 'homeScreen.dart';
+import 'registerScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -9,7 +12,53 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   bool _obscureText = true;
+  bool _isLoggingIn = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _signIn() async {
+    setState(() {
+      _isLoggingIn = true;
+    });
+
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+
+    final user = await _auth.signINnWithEmailAndPassword(email, password);
+
+    setState(() {
+      _isLoggingIn = false;
+    });
+
+    if (user != null) {
+      // Save session info
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setInt('loginTimestamp', DateTime.now().millisecondsSinceEpoch);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Sign in successful!")),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Sign in failed. Please try again.")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +82,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
-
-                // Email
-                const Text(
-                  'Email',
-                  style: TextStyle(color: Colors.white),
-                ),
+                const Text('Email', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'example@gmail.com',
                     filled: true,
@@ -53,12 +99,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Password',
-                  style: TextStyle(color: Colors.white),
-                ),
+                const Text('Password', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: _passwordController,
                   obscureText: _obscureText,
                   decoration: InputDecoration(
                     hintText: 'Enter your Password',
@@ -103,9 +147,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {},
-                    child: const Text(
-                      'Login',
+                    onPressed: _isLoggingIn ? null : _signIn,
+                    child: _isLoggingIn
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                      'Sign In',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -113,19 +159,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
                 Row(
                   children: const [
-                    Expanded(
-                      child: Divider(color: Colors.white70),
-                    ),
+                    Expanded(child: Divider(color: Colors.white70)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        'X',
-                        style: TextStyle(color: Colors.white70),
-                      ),
+                      child: Text('X', style: TextStyle(color: Colors.white70)),
                     ),
-                    Expanded(
-                      child: Divider(color: Colors.white70),
-                    ),
+                    Expanded(child: Divider(color: Colors.white70)),
                   ],
                 ),
                 const SizedBox(height: 20),
