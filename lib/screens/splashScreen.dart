@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isLoggedIn && (currentTime - loginTimestamp) < sixtyMinutes) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
       );
     } else {
       await prefs.clear();
@@ -44,9 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Color(0xFF238BBE),
-      body: Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
+      body: Center(child: CircularProgressIndicator(color: Colors.white)),
     );
   }
 }
