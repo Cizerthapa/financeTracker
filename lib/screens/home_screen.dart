@@ -1,4 +1,7 @@
+import 'package:finance_track/screens/bill_reminder_page.dart';
+import 'package:finance_track/screens/expense_statistics_page.dart';
 import 'package:finance_track/screens/profile_screen.dart';
+import 'package:finance_track/screens/transaction_summary_Screen.dart';
 import 'package:flutter/material.dart';
 
 class FinanceHomeScreen extends StatefulWidget {
@@ -11,16 +14,11 @@ class FinanceHomeScreen extends StatefulWidget {
 class _FinanceHomeScreenState extends State<FinanceHomeScreen> {
   int _selectedIndex = 0;
 
-  static const TextStyle textStyle = TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.w500,
-  );
-
-  static const List<Widget> _screens = <Widget>[
-    Center(child: Text('🏠 Home Page', style: textStyle)),
-    Center(child: Text('📊 Stats Page', style: textStyle)),
-    Center(child: Text('💳 Cards Page', style: textStyle)),
-    ProfilePage(),
+  static final List<Widget> _screens = <Widget>[
+    TransactionSummaryPage(),
+    ExpenseStatisticsPage(),
+    BillReminderPage(),
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
