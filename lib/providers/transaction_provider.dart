@@ -1,85 +1,44 @@
-import 'package:flutter/material.dart';
-
-class Transaction {
-  final String title;
-  final String method;
-  final double amount;
-  final String date;
-
-  Transaction({
-    required this.title,
-    required this.method,
-    required this.amount,
-    required this.date,
-  });
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finance_track/model/transaction_model.dart';
+import 'package:flutter/foundation.dart';
 
 class TransactionProvider with ChangeNotifier {
-  final List<Transaction> _transactions = [
-    Transaction(
-      title: 'Travel',
-      method: 'Debit Card',
-      amount: -360,
-      date: 'Dec 30, Thursday',
-    ),
-    Transaction(
-      title: 'Food',
-      method: 'Debit Card',
-      amount: -100,
-      date: 'Dec 30, Thursday',
-    ),
-    Transaction(
-      title: 'Rent',
-      method: 'Debit Card',
-      amount: -100,
-      date: 'Dec 30, Thursday',
-    ),
-    Transaction(
-      title: 'Income',
-      method: 'Debit Card',
-      amount: 100,
-      date: 'Dec 30, Thursday',
-    ),
-    Transaction(
-      title: 'Travel',
-      method: 'Debit Card',
-      amount: -360,
-      date: 'Dec 7, Saturday',
-    ),
-    Transaction(
-      title: 'Travel',
-      method: 'Debit Card',
-      amount: -360,
-      date: 'Dec 7, Saturday',
-    ),
-    Transaction(
-      title: 'Travel',
-      method: 'Debit Card',
-      amount: -360,
-      date: 'Dec 7, Saturday',
-    ),
-  ];
+  List<TransactionModel> _transactions = [];
 
-  List<Transaction> get transactions => _transactions;
+  List<TransactionModel> get transactions => _transactions;
 
-  Map<String, List<Transaction>> get groupedTransactions {
-    Map<String, List<Transaction>> map = {};
+  double get totalExpenses => _transactions
+      .where((t) => t.amount < 0)
+      .fold(0.0, (sum, t) => sum + t.amount);
+  double get totalIncome => _transactions
+      .where((t) => t.amount > 0)
+      .fold(0.0, (sum, t) => sum + t.amount);
+  double get totalAmount => totalIncome + totalExpenses;
+
+  Map<String, List<TransactionModel>> get groupedTransactions {
+    final Map<String, List<TransactionModel>> map = {};
     for (var tx in _transactions) {
-      if (!map.containsKey(tx.date)) {
-        map[tx.date] = [];
-      }
-      map[tx.date]!.add(tx);
+      map.putIfAbsent(tx.date, () => []).add(tx);
     }
     return map;
   }
 
-  double get totalExpenses => _transactions
-      .where((t) => t.amount < 0)
-      .fold(0, (sum, t) => sum + t.amount.abs());
+  Future<void> fetchTransactionsFromFirebase() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('transactions').get();
 
-  double get totalIncome => _transactions
-      .where((t) => t.amount > 0)
-      .fold(0, (sum, t) => sum + t.amount);
+    _transactions =
+        snapshot.docs.map((doc) {
+          final data = doc.data();
 
-  double get totalAmount => totalIncome - totalExpenses;
+          return TransactionModel(
+            title: data['title'] ?? '',
+            amount: (data['amount'] ?? 0).toDouble(),
+            method: data['method'] ?? '',
+            date: data['date'] ?? '',
+          );
+        }).toList();
+
+    notifyListeners();
+  }
 }
