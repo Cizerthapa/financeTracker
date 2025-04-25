@@ -1,3 +1,4 @@
+import 'package:finance_track/providers/login_provider.dart';
 import 'package:finance_track/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,8 +9,10 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ProfileProvider>(context);
-    final percentageSpent = provider.totalSpent / provider.budget;
+    final provider_profile = Provider.of<ProfileProvider>(context);
+    final provider_log = Provider.of<LoginProvider>(context);
+    final percentageSpent =
+        provider_profile.totalSpent / provider_profile.budget;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1389B2), // Deep blue full bg
@@ -31,11 +34,11 @@ class ProfilePage extends StatelessWidget {
               // Profile Picture & Name
               CircleAvatar(
                 radius: 40,
-                backgroundImage: NetworkImage(provider.profileImage),
+                backgroundImage: NetworkImage(provider_profile.profileImage),
               ),
               const SizedBox(height: 12),
               Text(
-                provider.name,
+                provider_profile.name,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -67,7 +70,8 @@ class ProfilePage extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '\$${provider.totalSpent.toStringAsFixed(0)}',
+                            text:
+                                '\$${provider_profile.totalSpent.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -80,7 +84,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                           TextSpan(
                             text:
-                                '\$${provider.budget.toStringAsFixed(0)} Spent',
+                                '\$${provider_profile.budget.toStringAsFixed(0)} Spent',
                             style: const TextStyle(color: Colors.white70),
                           ),
                         ],
@@ -96,7 +100,7 @@ class ProfilePage extends StatelessWidget {
                     // Legend (simplified)
                     Column(
                       children:
-                          provider.expenses.entries.map((entry) {
+                          provider_profile.expenses.entries.map((entry) {
                             final color = _getColor(entry.key);
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2),
@@ -154,7 +158,7 @@ class ProfilePage extends StatelessWidget {
                 text: 'Logout',
                 iconColor: Colors.red,
                 textColor: Colors.red,
-                onTap: provider.logout,
+                onTap: provider_log.logout,
               ),
 
               const SizedBox(height: 12),

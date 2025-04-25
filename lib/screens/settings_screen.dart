@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/login_provider.dart';
+import 'login_screen.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -38,7 +40,6 @@ class SettingsPage extends StatelessWidget {
 
           const Divider(),
 
-          // Other Settings
           _SettingsTile(
             icon: Icons.notifications,
             title: 'Notification Settings',
@@ -79,9 +80,19 @@ class SettingsPage extends StatelessWidget {
                 child: const Text('Cancel'),
               ),
               TextButton(
-                onPressed: () {
-                  // Add logout logic
+                onPressed: () async {
+                  final loginProvider = Provider.of<LoginProvider>(
+                    context,
+                    listen: false,
+                  );
+                  await loginProvider.logout();
                   Navigator.pop(context);
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
                 },
                 child: const Text(
                   'Logout',
@@ -110,34 +121,13 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: textColor),
+      leading: Icon(
+        icon,
+        color: textColor ?? Theme.of(context).iconTheme.color,
+      ),
       title: Text(title, style: TextStyle(color: textColor)),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
-    );
-  }
-}
-
-class _SettingsSwitchTile extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  const _SettingsSwitchTile({
-    required this.title,
-    required this.icon,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SwitchListTile(
-      secondary: Icon(icon),
-      title: Text(title),
-      value: value,
-      onChanged: onChanged,
     );
   }
 }

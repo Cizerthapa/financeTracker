@@ -1,5 +1,6 @@
+import 'package:finance_track/providers/login_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import '../firebase_auth_implementation/firebase_auth_services.dart';
 import 'home_screen.dart';
 import 'registerScreen.dart';
@@ -42,12 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       // Save session info
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setInt(
-        'loginTimestamp',
-        DateTime.now().millisecondsSinceEpoch,
-      );
+      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+      loginProvider.login(email, password);
 
       ScaffoldMessenger.of(
         context,

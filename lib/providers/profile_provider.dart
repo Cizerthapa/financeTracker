@@ -9,10 +9,4 @@ class ProfileProvider with ChangeNotifier {
   double budget = 20000;
 
   Map<String, double> expenses = {"Food": 4000, "Rent": 4000, "Other": 4000};
-
-  void logout() {
-    // Perform logout logic
-    debugPrint("User logged out");
-    // notifyListeners() if state changes
-  }
 }
