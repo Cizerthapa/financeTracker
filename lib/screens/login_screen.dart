@@ -1,7 +1,8 @@
+import 'package:finance_track/providers/login_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import '../firebase_auth_implementation/firebase_auth_services.dart';
-import 'homeScreen.dart';
+import 'home_screen.dart';
 import 'registerScreen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -34,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    final user = await _auth.signINnWithEmailAndPassword(email, password);
+    final user = await _auth.signInWithEmailAndPassword(email, password);
 
     setState(() {
       _isLoggingIn = false;
@@ -42,16 +43,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       // Save session info
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setInt('loginTimestamp', DateTime.now().millisecondsSinceEpoch);
+      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+      loginProvider.login(email, password);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sign in successful!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Sign in successful!")));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -91,7 +91,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'example@gmail.com',
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -108,7 +111,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'Enter your Password',
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -148,12 +154,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     onPressed: _isLoggingIn ? null : _signIn,
-                    child: _isLoggingIn
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                      'Sign In',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                    child:
+                        _isLoggingIn
+                            ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                            : const Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -171,12 +183,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don’t have an account? ", style: TextStyle(color: Colors.white)),
+                    const Text(
+                      "Don’t have an account? ",
+                      style: TextStyle(color: Colors.white),
+                    ),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
                         );
                       },
                       child: const Text(
