@@ -3,6 +3,7 @@ import 'package:finance_track/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/profile_provider.dart';
+import 'login_screen.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -158,8 +159,16 @@ class ProfilePage extends StatelessWidget {
                 text: 'Logout',
                 iconColor: Colors.red,
                 textColor: Colors.red,
-                onTap: provider_log.logout,
+                onTap: () async {
+                  await provider_log.logout();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        (Route<dynamic> route) => false,
+                  );
+                },
               ),
+
 
               const SizedBox(height: 12),
               const Text(
