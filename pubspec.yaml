@@ -40,6 +40,10 @@ dependencies:
   firebase_auth: ^5.5.2
   firebase_storage: ^12.4.5
   shared_preferences: ^2.5.3
+  is_wear: ^0.0.2+3
+  wear_plus: ^1.2.3
+  watch_connectivity: ^0.2.1+1
+
 
 dev_dependencies:
   flutter_test:

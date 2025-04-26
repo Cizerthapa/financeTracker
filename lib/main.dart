@@ -7,14 +7,22 @@ import 'package:finance_track/providers/registerProvider.dart';
 import 'package:finance_track/providers/theme_provider.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:finance_track/screens/splash_screen.dart';
+import 'package:finance_track/screens/watchwearos_homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:is_wear/is_wear.dart';
+
+
+final _isWearPlugin = IsWear();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  bool isWears = await _isWearPlugin.check()??false;
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
     MultiProvider(
       providers: [
@@ -28,13 +36,14 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ExpenseStatisticsProvider()),
         ChangeNotifierProvider(create: (_) => BillReminderProvider()),
       ],
-      child: const MyApp(),
+      child: MyApp(isWear: isWears),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final bool isWear;
+  const MyApp({super.key, required this.isWear});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -73,7 +82,7 @@ class _MyAppState extends State<MyApp> {
       themeMode: themeProvider.themeMode,
       theme: themeProvider.lightTheme,
       darkTheme: themeProvider.darkTheme,
-      home: const SplashScreen(),
+      home: widget.isWear ? WatchwearosHomescreen(): SplashScreen(),
     );
   }
 }
