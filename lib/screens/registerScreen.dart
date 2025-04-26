@@ -1,3 +1,4 @@
+    import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../firebase_auth_implementation/firebase_auth_services.dart';
@@ -221,13 +222,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     if (user != null) {
-      SnackBar(content: Text("Registration successful!"));
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'username': username,
+        'phone': phone,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration successful!")),
+      );
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     } else {
-      SnackBar(content: Text("Registration failed. Try again."));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration failed. Try again.")),
+      );
     }
   }
+
 }

@@ -15,11 +15,10 @@ class LoginProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    _isLoggedIn = false;
-
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('isLoggedIn');
-    await prefs.remove('loginTimestamp');
+    await prefs.clear();
+
+    _isLoggedIn = false;
     notifyListeners();
   }
 }
