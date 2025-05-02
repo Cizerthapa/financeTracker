@@ -82,7 +82,8 @@ class _MyAppState extends State<MyApp> {
       themeMode: themeProvider.themeMode,
       theme: themeProvider.lightTheme,
       darkTheme: themeProvider.darkTheme,
-      home: widget.isWear ? WatchwearosHomescreen(): SplashScreen(),
+      // home: widget.isWear ? WatchwearosHomescreen(): SplashScreen(),
+      home: SplashScreen(isWear: widget.isWear,),
     );
   }
 }

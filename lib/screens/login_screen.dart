@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../firebase_auth_implementation/firebase_auth_services.dart';
 import 'home_screen.dart';
 import 'registerScreen.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -12,13 +13,22 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+{
+
+  late WatchConnectivity _watchConnectivity;
   final FirebaseAuthService _auth = FirebaseAuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscureText = true;
   bool _isLoggingIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _watchConnectivity = WatchConnectivity();
+  }
 
   @override
   void dispose() {
@@ -43,17 +53,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       // Save session info
+
       final loginProvider = Provider.of<LoginProvider>(context, listen: false);
-      loginProvider.login(email, password);
+      loginProvider.login(email, password, _watchConnectivity);
 
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Sign in successful!")));
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
       );
-    } else {
+
+
+    }
+    else
+    {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Sign in failed. Please try again.")),
       );
@@ -214,4 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+
+
 }
