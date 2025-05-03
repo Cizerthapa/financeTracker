@@ -1,8 +1,6 @@
-import 'package:finance_track/screens/watchwear_notlogin.dart';
 import 'package:finance_track/screens/watchwearos_homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_connectivity/watch_connectivity.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 
@@ -24,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    final isWearOsLoggedIn = prefs.getBool('isWearLoggedIn') ?? false;
+    // final isWearOsLoggedIn = prefs.getBool('isWearLoggedIn') ?? false;
     final loginTimestamp = prefs.getInt('loginTimestamp') ?? 0;
 
     final currentTime = DateTime.now().millisecondsSinceEpoch;

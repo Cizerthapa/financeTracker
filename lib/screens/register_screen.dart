@@ -1,4 +1,4 @@
-    import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../firebase_auth_implementation/firebase_auth_services.dart';

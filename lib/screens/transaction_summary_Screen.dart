@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/transaction_provider.dart';
+import 'add_transaction_page.dart';
 
 class TransactionSummaryPage extends StatefulWidget {
   @override
@@ -55,112 +56,124 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
           ),
         ],
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                children: [
-                  Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SummaryItem(
-                          label: "Expenses",
-                          amount:
-                              "\$${provider.totalExpenses.toStringAsFixed(2)}",
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xff0077A3),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddTransactionPage(),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'Add Income/Expense',
+      ),
+
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+        children: [
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SummaryItem(
+                  label: "Expenses",
+                  amount:
+                  "\$${provider.totalExpenses.toStringAsFixed(2)}",
+                ),
+                SummaryItem(
+                  label: "Income",
+                  amount:
+                  "\$${provider.totalIncome.toStringAsFixed(2)}",
+                ),
+                SummaryItem(
+                  label: "Total",
+                  amount:
+                  "\$${provider.totalAmount.toStringAsFixed(2)}",
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              children: groupedTx.entries.map((entry) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      child: Text(
+                        entry.key,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SummaryItem(
-                          label: "Income",
-                          amount:
-                              "\$${provider.totalIncome.toStringAsFixed(2)}",
-                        ),
-                        SummaryItem(
-                          label: "Total",
-                          amount:
-                              "\$${provider.totalAmount.toStringAsFixed(2)}",
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      children:
-                          groupedTx.entries.map((entry) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  child: Text(
-                                    entry.key,
+                    ...entry.value.map(
+                          (item) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.title,
                                     style: const TextStyle(
-                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                                ...entry.value.map(
-                                  (item) => Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 4,
-                                    ),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                item.title,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                item.method,
-                                                style: TextStyle(
-                                                  color: Colors.grey[600],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Text(
-                                            "${item.amount > 0 ? '▲' : '▼'} \$${item.amount.abs().toStringAsFixed(2)}",
-                                            style: TextStyle(
-                                              color:
-                                                  item.amount > 0
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    item.method,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
                                     ),
                                   ),
+                                ],
+                              ),
+                              Text(
+                                "${item.amount > 0 ? '▲' : '▼'} \$${item.amount.abs().toStringAsFixed(2)}",
+                                style: TextStyle(
+                                  color: item.amount > 0
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
-                            );
-                          }).toList(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

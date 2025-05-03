@@ -7,6 +7,16 @@ class TransactionProvider with ChangeNotifier {
 
   List<TransactionModel> get transactions => _transactions;
 
+
+  Future<void> addTransaction(Map<String, dynamic> newTransaction) async {
+    await FirebaseFirestore.instance.collection('transactions').add(newTransaction);
+
+    final txModel = TransactionModel.fromMap(newTransaction);
+    _transactions.add(txModel);
+    notifyListeners();
+  }
+
+
   double get totalExpenses => _transactions
       .where((t) => t.amount < 0)
       .fold(0.0, (sum, t) => sum + t.amount);

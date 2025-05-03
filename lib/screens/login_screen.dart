@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../firebase_auth_implementation/firebase_auth_services.dart';
 import 'home_screen.dart';
-import 'registerScreen.dart';
+import 'register_screen.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 class LoginScreen extends StatefulWidget {
