@@ -6,7 +6,8 @@ import 'package:finance_track/providers/profile_provider.dart';
 import 'package:finance_track/providers/registerProvider.dart';
 import 'package:finance_track/providers/theme_provider.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
-import 'package:finance_track/screens/splash_screen.dart';
+import 'package:finance_track/screens/phone_screens/splash_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';

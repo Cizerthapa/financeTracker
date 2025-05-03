@@ -1,8 +1,10 @@
 import 'package:finance_track/providers/login_provider.dart';
-import 'package:finance_track/screens/settings_screen.dart';
+import 'package:finance_track/screens/phone_screens/settings_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/profile_provider.dart';
+
+import '../../providers/profile_provider.dart';
 import 'login_screen.dart';
 
 class ProfilePage extends StatelessWidget {

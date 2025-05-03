@@ -1,4 +1,6 @@
-import 'package:finance_track/screens/watchwearos_homescreen.dart';
+
+import 'package:finance_track/screens/watch_screens/watchwearos_homescreen.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';

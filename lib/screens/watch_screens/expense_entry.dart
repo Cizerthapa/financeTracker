@@ -1,7 +1,9 @@
-import 'package:finance_track/screens/watchwear_screens/calculator.dart';
-import 'package:finance_track/screens/watchwear_screens/categories.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'calculator.dart';
+import 'categories.dart';
 
 class ExpenseEntry extends StatefulWidget {
   const ExpenseEntry({super.key});

@@ -1,6 +1,8 @@
-import 'package:finance_track/screens/watchwear_screens/add_new_budget.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'add_new_budget.dart';
 
 class SpendingAlerts extends StatefulWidget {
   const SpendingAlerts({super.key});

@@ -1,79 +1,35 @@
-import 'package:finance_track/providers/login_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../firebase_auth_implementation/firebase_auth_services.dart';
-import 'home_screen.dart';
-import 'register_screen.dart';
-import 'package:watch_connectivity/watch_connectivity.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+import '../../firebase_auth_implementation/firebase_auth_services.dart';
+import 'login_screen.dart';
+
+
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-{
-
-  late WatchConnectivity _watchConnectivity;
+class _RegisterScreenState extends State<RegisterScreen> {
   final FirebaseAuthService _auth = FirebaseAuthService();
+
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _obscureText = true;
-  bool _isLoggingIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _watchConnectivity = WatchConnectivity();
-  }
+  bool _obscurePassword = true;
+  bool _isSigningUp = false;
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  void _signIn() async {
-    setState(() {
-      _isLoggingIn = true;
-    });
-
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
-
-    final user = await _auth.signInWithEmailAndPassword(email, password);
-
-    setState(() {
-      _isLoggingIn = false;
-    });
-
-    if (user != null) {
-      // Save session info
-
-      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
-      loginProvider.login(email, password, _watchConnectivity);
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Sign in successful!")));
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
-      );
-
-
-    }
-    else
-    {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sign in failed. Please try again.")),
-      );
-    }
   }
 
   @override
@@ -87,9 +43,9 @@ class _LoginScreenState extends State<LoginScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
                 const Text(
-                  'Welcome Back!',
+                  'Create new account!',
                   style: TextStyle(
                     fontSize: 24,
                     color: Colors.white,
@@ -97,32 +53,40 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 8),
+                const Text(
+                  'Create an account to login!',
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                const Text('Username', style: TextStyle(color: Colors.white)),
+                const SizedBox(height: 8),
+                _inputField(
+                  hint: 'Enter your username',
+                  controller: _usernameController,
+                ),
+                const SizedBox(height: 16),
                 const Text('Email', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
-                TextField(
+                _inputField(
+                  hint: 'example@gmail.com',
                   controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    hintText: 'example@gmail.com',
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
+                const Text('Phone', style: TextStyle(color: Colors.white)),
+                const SizedBox(height: 8),
+                _inputField(
+                  hint: 'Enter your phone',
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneController,
+                ),
+                const SizedBox(height: 16),
                 const Text('Password', style: TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _passwordController,
-                  obscureText: _obscureText,
+                  obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Enter your Password',
                     filled: true,
@@ -137,29 +101,20 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: Colors.grey[700],
                       ),
                       onPressed: () {
                         setState(() {
-                          _obscureText = !_obscureText;
+                          _obscurePassword = !_obscurePassword;
                         });
                       },
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Forgot your password?',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 24),
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
@@ -169,14 +124,14 @@ class _LoginScreenState extends State<LoginScreen>
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: _isLoggingIn ? null : _signIn,
+                    onPressed: _signUp,
                     child:
-                        _isLoggingIn
+                        _isSigningUp
                             ? const CircularProgressIndicator(
                               color: Colors.white,
                             )
                             : const Text(
-                              'Sign In',
+                              'Signup',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -200,23 +155,19 @@ class _LoginScreenState extends State<LoginScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Don’t have an account? ",
-                      style: TextStyle(color: Colors.white),
+                      "Already have an account? ",
+                      style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterScreen(),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                       child: const Text(
-                        'Sign Up',
+                        'Login',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
+                          fontSize: 14,
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -231,6 +182,65 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  Widget _inputField({
+    required String hint,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
 
+  void _signUp() async {
+    setState(() {
+      _isSigningUp = true;
+    });
+
+    String username = _usernameController.text.trim();
+    String email = _emailController.text.trim();
+    String phone = _phoneController.text.trim();
+    String password = _passwordController.text.trim();
+
+    final user = await _auth.signUpWithEmailAndPassword(email, password);
+
+    setState(() {
+      _isSigningUp = false;
+    });
+
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'username': username,
+        'phone': phone,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration successful!")),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration failed. Try again.")),
+      );
+    }
+  }
 
 }

@@ -1,11 +1,12 @@
-import 'package:finance_track/screens/watchwear_screens/budget_summary.dart';
-import 'package:finance_track/screens/watchwear_screens/expense_entry.dart';
-import 'package:finance_track/screens/watchwear_screens/spending_alerts.dart';
-import 'package:finance_track/screens/watchwear_screens/transaction_history.dart';
+
+import 'package:finance_track/screens/watch_screens/spending_alerts.dart';
+import 'package:finance_track/screens/watch_screens/transaction_history.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/transaction_provider.dart';
+import 'budget_summary.dart';
+import 'expense_entry.dart';
 
 class WatchwearosHomescreen extends StatefulWidget {
   const WatchwearosHomescreen({super.key});
