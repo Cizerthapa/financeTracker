@@ -15,22 +15,8 @@ class BillReminderPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF197BA6),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () {},
-        ),
         title: const Text('Bill Reminder'),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-            onPressed: () {
-              provider.addReminder(
-                BillReminder(title: 'New Bill', amount: 10000.00),
-              );
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [

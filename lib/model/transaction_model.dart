@@ -10,4 +10,22 @@ class TransactionModel {
     required this.method,
     required this.date,
   });
+
+  factory TransactionModel.fromMap(Map<String, dynamic> map) {
+    return TransactionModel(
+      amount: (map['amount'] as num).toDouble(),
+      date: map['date'] ?? '',
+      method: map['method'] ?? '',
+      title: map['title'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'amount': amount,
+      'date': date,
+      'method': method,
+      'title': title,
+    };
+  }
 }

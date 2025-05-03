@@ -1,8 +1,10 @@
-import 'package:finance_track/screens/bill_reminder_page.dart';
-import 'package:finance_track/screens/expense_statistics_page.dart';
-import 'package:finance_track/screens/profile_screen.dart';
-import 'package:finance_track/screens/transaction_summary_Screen.dart';
+
+import 'package:finance_track/screens/phone_screens/profile_screen.dart';
+import 'package:finance_track/screens/phone_screens/transaction_summary_Screen.dart';
 import 'package:flutter/material.dart';
+
+import 'bill_reminder_page.dart';
+import 'expense_statistics_page.dart';
 
 class FinanceHomeScreen extends StatefulWidget {
   const FinanceHomeScreen({super.key});

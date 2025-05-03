@@ -6,12 +6,12 @@ import 'package:finance_track/providers/profile_provider.dart';
 import 'package:finance_track/providers/registerProvider.dart';
 import 'package:finance_track/providers/theme_provider.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
-import 'package:finance_track/screens/splash_screen.dart';
-import 'package:finance_track/screens/watchwearos_homescreen.dart';
+import 'package:finance_track/screens/phone_screens/splash_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'utils/firebase_options.dart';
 import 'package:is_wear/is_wear.dart';
 
 
@@ -82,7 +82,8 @@ class _MyAppState extends State<MyApp> {
       themeMode: themeProvider.themeMode,
       theme: themeProvider.lightTheme,
       darkTheme: themeProvider.darkTheme,
-      home: widget.isWear ? WatchwearosHomescreen(): SplashScreen(),
+      // home: widget.isWear ? WatchwearosHomescreen(): SplashScreen(),
+      home: SplashScreen(isWear: widget.isWear,),
     );
   }
 }
