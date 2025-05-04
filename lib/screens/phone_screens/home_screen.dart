@@ -1,6 +1,6 @@
 
 import 'package:finance_track/screens/phone_screens/profile_screen.dart';
-import 'package:finance_track/screens/phone_screens/transaction_summary_Screen.dart';
+import 'package:finance_track/screens/phone_screens/transaction_summary_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'bill_reminder_page.dart';
