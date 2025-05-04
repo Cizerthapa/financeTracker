@@ -43,6 +43,7 @@ dependencies:
   is_wear: ^0.0.2+3
   wear_plus: ^1.2.3
   watch_connectivity: ^0.2.1+1
+  intl: ^0.20.2
 
 
 dev_dependencies:

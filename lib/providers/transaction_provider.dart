@@ -7,7 +7,6 @@ class TransactionProvider with ChangeNotifier {
 
   List<TransactionModel> get transactions => _transactions;
 
-
   Future<void> addTransaction(Map<String, dynamic> newTransaction) async {
     await FirebaseFirestore.instance.collection('transactions').add(newTransaction);
 
@@ -16,14 +15,15 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-
   double get totalExpenses => _transactions
-      .where((t) => t.amount < 0)
+      .where((t) => t.type.toLowerCase() == 'expense')
       .fold(0.0, (sum, t) => sum + t.amount);
+
   double get totalIncome => _transactions
-      .where((t) => t.amount > 0)
+      .where((t) => t.type.toLowerCase() == 'income')
       .fold(0.0, (sum, t) => sum + t.amount);
-  double get totalAmount => totalIncome + totalExpenses;
+
+  double get totalAmount => totalIncome - totalExpenses;
 
   Map<String, List<TransactionModel>> get groupedTransactions {
     final Map<String, List<TransactionModel>> map = {};
@@ -35,19 +35,11 @@ class TransactionProvider with ChangeNotifier {
 
   Future<void> fetchTransactionsFromFirebase() async {
     final snapshot =
-        await FirebaseFirestore.instance.collection('transactions').get();
+    await FirebaseFirestore.instance.collection('transactions').get();
 
-    _transactions =
-        snapshot.docs.map((doc) {
-          final data = doc.data();
-
-          return TransactionModel(
-            title: data['title'] ?? '',
-            amount: (data['amount'] ?? 0).toDouble(),
-            method: data['method'] ?? '',
-            date: data['date'] ?? '',
-          );
-        }).toList();
+    _transactions = snapshot.docs
+        .map((doc) => TransactionModel.fromMap(doc.data()))
+        .toList();
 
     notifyListeners();
   }
