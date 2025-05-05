@@ -28,95 +28,109 @@ class _AddNewBudgetState extends State<AddNewBudget> {
           height: double.infinity,
           child: Padding(
             padding: EdgeInsets.only(left: 20, right: 20, top: 50),
-            child: Center(
-                child: Column(
-                  children: [
+            child: Column(
+              children: [
+                Text("Add New Spending Alerts",
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold
+                  ),),
+                SizedBox(
+                  height: 3,
+                ),
+                Center(
+                    child: Column(
+                      children: [
 
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal:25, vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      onPressed: () {
-                        print('Button Pressed');
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min, // Adjust size based on content
-                        children: [
-                          Icon(Icons.tag_rounded, size: 16, color: Colors.black87),
-
-                          Text(
-                            'Categories',
-                            style: TextStyle(fontSize: 12, color: Colors.black87),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 2,),
-                    Center(
-                      child: Row(
-                        children:
-                        [
-                          Container(
-
-                            decoration: BoxDecoration(
-                              color: Colors.white, // Set background color here
-                              borderRadius: BorderRadius.circular(5),  // Set the border radius here
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(horizontal:25, vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
                             ),
-                            child: SizedBox(
-                              width: 155,
-                              height: 35,
+                          ),
+                          onPressed: () {
+                            print('Button Pressed');
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min, // Adjust size based on content
+                            children: [
+                              Icon(Icons.tag_rounded, size: 16, color: Colors.black87),
 
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.attach_money_outlined, size: 16, color: Colors.black87),
-                                  SizedBox(width: 1),
-                                  Text(
-                                    "0",
-                                  )
-
-                                ],
+                              Text(
+                                'Categories',
+                                style: TextStyle(fontSize: 12, color: Colors.black87),
                               ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 2,),
+                        Center(
+                          child: Row(
+                            children:
+                            [
+                              Container(
+
+                                decoration: BoxDecoration(
+                                  color: Colors.white, // Set background color here
+                                  borderRadius: BorderRadius.circular(5),  // Set the border radius here
+                                ),
+                                child: SizedBox(
+                                  width: 155,
+                                  height: 35,
+
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.attach_money_outlined, size: 16, color: Colors.black87),
+                                      SizedBox(width: 1),
+                                      Text(
+                                        "0",
+                                      )
+
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(width: 3,),
+
+                              Icon(Icons.calculate_sharp, size: 28,),
+
+
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black87,
+                            padding: EdgeInsets.symmetric(horizontal:25, vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
                             ),
                           ),
+                          onPressed: () {
+                            print('Button Pressed');
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min, // Adjust size based on content
+                            children: [
 
-                          SizedBox(width: 3,),
-
-                          Icon(Icons.calculate_sharp, size: 28,),
-
-
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black87,
-                        padding: EdgeInsets.symmetric(horizontal:25, vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      onPressed: () {
-                        print('Button Pressed');
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min, // Adjust size based on content
-                        children: [
-
-                          Text(
-                            'Done',
-                            style: TextStyle(fontSize: 12, color: Colors.white),
+                              Text(
+                                'Done',
+                                style: TextStyle(fontSize: 12, color: Colors.white),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
+                        ),
+                      ],
+                    )
+                ),
+              ],
+
             ),
           ),
         ),

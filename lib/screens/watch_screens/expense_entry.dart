@@ -36,6 +36,15 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
             child: Center(
               child: Column(
                 children: [
+                  Text("Spending Alerts",
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold
+                    ),),
+                  SizedBox(
+                    height: 3,
+                  ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,

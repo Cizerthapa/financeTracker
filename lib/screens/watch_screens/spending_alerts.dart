@@ -36,58 +36,74 @@ class _SpendingAlertsState extends State<SpendingAlerts> {
           child:  Padding(
             padding: const EdgeInsets.all(20.0),
             child: Expanded(
-              child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: [
-                      Container(
+              child: Column(
+                children: [
 
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Text("Rent", style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 11
-                              ),),
-                              Spacer(),
-                              Row(
-                                children: [
-                                  Text("\$50", style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 11
-                                  ),),
-                                  SizedBox(
-                                    width: 3,
-                                  ),
-                                  Text("-", style: TextStyle(
-                                      color: Colors.red
-                                      ,fontSize: 11
-                                  ),),
-                                  SizedBox(
-                                    width: 3,
-                                  ),
-                                  Text("\$100", style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 11
-                                  ),),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      )
-                    ],
-                  );
-                },
+                  Text("Spending Alerts",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold
+                  ),),
+                  SizedBox(
+                    height: 3,
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: 10,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Column(
+                          children: [
+                            Container(
+                    
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Text("Rent", style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 11
+                                    ),),
+                                    Spacer(),
+                                    Row(
+                                      children: [
+                                        Text("\$50", style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 11
+                                        ),),
+                                        SizedBox(
+                                          width: 3,
+                                        ),
+                                        Text("-", style: TextStyle(
+                                            color: Colors.red
+                                            ,fontSize: 11
+                                        ),),
+                                        SizedBox(
+                                          width: 3,
+                                        ),
+                                        Text("\$100", style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 11
+                                        ),),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            )
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
 
             ),
