@@ -46,9 +46,9 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 Text(
                   "Dec, 2025",
                   style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14
                   ),
                 ),
                 Center(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import '../../model/transaction_model.dart';
 import '../../providers/transaction_provider.dart';
 import 'add_transaction_page.dart';
-
 
 class TransactionSummaryPage extends StatefulWidget {
   @override
@@ -12,6 +13,9 @@ class TransactionSummaryPage extends StatefulWidget {
 class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
   bool _isLoading = true;
   bool _isInitialized = false;
+  DateTime _selectedMonth = DateTime.now();
+
+  String _selectedTypeFilter = 'All'; // Options: All, Income, Expense
 
   @override
   void didChangeDependencies() {
@@ -29,10 +33,48 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
     }
   }
 
+  String get formattedMonthYear {
+    return DateFormat.yMMMM().format(_selectedMonth);
+  }
+
+  Future<void> _pickMonthYear() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedMonth,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+      helpText: 'Select Month and Year',
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedMonth = picked;
+        // Optional: filter transactions by _selectedMonth.month/year here
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
-    final groupedTx = provider.groupedTransactions;
+
+    final filteredTransactions = provider.transactions.where((tx) {
+      try {
+        final txDate = DateFormat.yMMMMd().parse(tx.date);
+        final matchesDate = txDate.month == _selectedMonth.month && txDate.year == _selectedMonth.year;
+        final matchesType = _selectedTypeFilter == 'All' || tx.type == _selectedTypeFilter;
+        return matchesDate && matchesType;
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+
+
+    // Group filtered transactions by date string
+    final groupedTx = <String, List<TransactionModel>>{};
+    for (var tx in filteredTransactions) {
+      groupedTx.putIfAbsent(tx.date, () => []).add(tx);
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xff0077A3),
@@ -40,20 +82,38 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
         backgroundColor: const Color(0xff0077A3),
         elevation: 0,
         centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.arrow_back_ios, size: 16),
-            SizedBox(width: 4),
-            Text("December, 2024"),
-            SizedBox(width: 4),
-            Icon(Icons.arrow_forward_ios, size: 16),
-          ],
+        title: GestureDetector(
+          onTap: _pickMonthYear,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.calendar_month, size: 20, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(
+                formattedMonthYear,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.filter_alt_outlined),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.filter_alt_outlined),
+            onSelected: (value) {
+              setState(() {
+                _selectedTypeFilter = value;
+              });
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'All', child: Text('All')),
+              const PopupMenuItem(value: 'Income', child: Text('Income')),
+              const PopupMenuItem(value: 'Expense', child: Text('Expense')),
+            ],
           ),
         ],
       ),
@@ -71,7 +131,6 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
         child: const Icon(Icons.add),
         tooltip: 'Add Income/Expense',
       ),
-
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -101,7 +160,14 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
             ),
           ),
           Expanded(
-            child: ListView(
+            child: groupedTx.isEmpty
+                ? const Center(
+              child: Text(
+                "Nothing to show",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            )
+                : ListView(
               children: groupedTx.entries.map((entry) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,8 +202,7 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
                             MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     item.title,
@@ -155,9 +220,9 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
                                 ],
                               ),
                               Text(
-                                "${item.amount > 0 ? '▲' : '▼'} \$${item.amount.abs().toStringAsFixed(2)}",
+                                "${item.type == 'Income' ? '▲' : '▼'} \$${item.amount.abs().toStringAsFixed(2)}",
                                 style: TextStyle(
-                                  color: item.amount > 0
+                                  color: item.type == 'Income'
                                       ? Colors.green
                                       : Colors.red,
                                   fontWeight: FontWeight.bold,
