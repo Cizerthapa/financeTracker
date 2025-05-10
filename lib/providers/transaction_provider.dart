@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_track/model/transaction_model.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TransactionProvider with ChangeNotifier {
   List<TransactionModel> _transactions = [];
@@ -34,8 +35,17 @@ class TransactionProvider with ChangeNotifier {
   }
 
   Future<void> fetchTransactionsFromFirebase() async {
-    final snapshot =
-    await FirebaseFirestore.instance.collection('transactions').get();
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('userUID');
+
+    if (uid == null) {
+      return;
+    }
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('transactions')
+        .where('uid', isEqualTo: uid)
+        .get();
 
     _transactions = snapshot.docs
         .map((doc) => TransactionModel.fromMap(doc.data()))

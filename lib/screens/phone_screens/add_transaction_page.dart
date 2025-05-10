@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finance_track/model/transaction_model.dart';
+import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../../providers/transaction_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddTransactionPage extends StatefulWidget {
   @override
@@ -45,12 +47,24 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     setState(() => _isSaving = true);
 
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('userUID');
+
+    if (uid == null) {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in.')),
+      );
+      return;
+    }
+
     final newTx = {
       'amount': double.parse(_amountController.text),
       'title': _titleController.text.trim(),
       'method': _selectedMethod,
       'type': _selectedType,
       'date': _dateController.text.trim(),
+      'uid': uid,
       'timestamp': Timestamp.now(),
     };
 
@@ -101,12 +115,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                     ? 'Enter a valid amount'
                     : null,
               ),
+
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Title'),
                 validator: (value) =>
                 value == null || value.isEmpty ? 'Enter a title' : null,
               ),
+
               TextFormField(
                 controller: _dateController,
                 readOnly: true,
@@ -116,11 +132,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                   suffixIcon: Icon(Icons.calendar_today),
                 ),
               ),
+
               DropdownButtonFormField<String>(
                 value: _selectedMethod,
                 items: _methods
-                    .map((method) =>
-                    DropdownMenuItem(value: method, child: Text(method)))
+                    .map((method) => DropdownMenuItem(value: method, child: Text(method)))
                     .toList(),
                 onChanged: (value) {
                   setState(() {
@@ -129,11 +145,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 },
                 decoration: const InputDecoration(labelText: 'Method'),
               ),
+
               DropdownButtonFormField<String>(
                 value: _selectedType,
                 items: _types
-                    .map((type) =>
-                    DropdownMenuItem(value: type, child: Text(type)))
+                    .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                     .toList(),
                 onChanged: (value) {
                   setState(() {
@@ -142,6 +158,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 },
                 decoration: const InputDecoration(labelText: 'Type'),
               ),
+
+              // Save Button
               const SizedBox(height: 24),
               _isSaving
                   ? const Center(child: CircularProgressIndicator())

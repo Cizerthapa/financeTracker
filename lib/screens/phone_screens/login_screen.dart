@@ -54,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     if (user != null) {
-      // Save session info
 
       final loginProvider = Provider.of<LoginProvider>(context, listen: false);
       loginProvider.login(email, password, _watchConnectivity);

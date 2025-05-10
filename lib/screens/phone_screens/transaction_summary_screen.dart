@@ -15,16 +15,15 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
   bool _isInitialized = false;
   DateTime _selectedMonth = DateTime.now();
 
-  String _selectedTypeFilter = 'All'; // Options: All, Income, Expense
+  String _selectedTypeFilter = 'All';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
-      Provider.of<TransactionProvider>(
-        context,
-        listen: false,
-      ).fetchTransactionsFromFirebase().then((_) {
+      Provider.of<TransactionProvider>(context, listen: false)
+          .fetchTransactionsFromFirebase()
+          .then((_) {
         setState(() {
           _isLoading = false;
           _isInitialized = true;
@@ -49,7 +48,6 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
     if (picked != null) {
       setState(() {
         _selectedMonth = picked;
-        // Optional: filter transactions by _selectedMonth.month/year here
       });
     }
   }
@@ -69,8 +67,6 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
       }
     }).toList();
 
-
-    // Group filtered transactions by date string
     final groupedTx = <String, List<TransactionModel>>{};
     for (var tx in filteredTransactions) {
       groupedTx.putIfAbsent(tx.date, () => []).add(tx);
@@ -86,17 +82,12 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
           onTap: _pickMonthYear,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(Icons.calendar_month, size: 20, color: Colors.white),
               const SizedBox(width: 8),
               Text(
                 formattedMonthYear,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ],
           ),
@@ -123,9 +114,7 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => AddTransactionPage(),
-            ),
+            MaterialPageRoute(builder: (context) => AddTransactionPage()),
           );
         },
         child: const Icon(Icons.add),
@@ -143,96 +132,58 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
               children: [
                 SummaryItem(
                   label: "Expenses",
-                  amount:
-                  "\$${provider.totalExpenses.toStringAsFixed(2)}",
+                  amount: "₨${provider.totalExpenses.toStringAsFixed(2)}",
                 ),
                 SummaryItem(
                   label: "Income",
-                  amount:
-                  "\$${provider.totalIncome.toStringAsFixed(2)}",
+                  amount: "₨${provider.totalIncome.toStringAsFixed(2)}",
                 ),
                 SummaryItem(
                   label: "Total",
-                  amount:
-                  "\$${provider.totalAmount.toStringAsFixed(2)}",
+                  amount: "₨${provider.totalAmount.toStringAsFixed(2)}",
                 ),
               ],
             ),
           ),
           Expanded(
             child: groupedTx.isEmpty
-                ? const Center(
-              child: Text(
-                "Nothing to show",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            )
+                ? const Center(child: Text("Nothing to show", style: TextStyle(color: Colors.white, fontSize: 16)))
                 : ListView(
               children: groupedTx.entries.map((entry) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      child: Text(
-                        entry.key,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Text(entry.key, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
-                    ...entry.value.map(
-                          (item) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.title,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item.method,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
+                    ...entry.value.map((item) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 4),
+                                Text(item.method, style: TextStyle(color: Colors.grey[600])),
+                              ],
+                            ),
+                            Text(
+                              "${item.type == 'Income' ? '▲' : '▼'} ₨${item.amount.abs().toStringAsFixed(2)}",
+                              style: TextStyle(
+                                color: item.type == 'Income' ? Colors.green : Colors.red,
+                                fontWeight: FontWeight.bold,
                               ),
-                              Text(
-                                "${item.type == 'Income' ? '▲' : '▼'} \$${item.amount.abs().toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  color: item.type == 'Income'
-                                      ? Colors.green
-                                      : Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
+                    )),
                   ],
                 );
               }).toList(),
