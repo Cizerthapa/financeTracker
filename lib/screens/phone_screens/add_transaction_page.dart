@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finance_track/model/transaction_model.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
