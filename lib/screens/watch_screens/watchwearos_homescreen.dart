@@ -23,22 +23,18 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
     if (dx > 10)
     {
       Navigator.push(context, MaterialPageRoute(builder: (context) => ExpenseEntry()));
-
     }
     else if (dx < -10)
     {
       Navigator.push(context, MaterialPageRoute(builder: (context) => BudgetSummary()));
-
     }
     else if (dy > 10)
     {
       Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionHistory()));
-
     }
     else if (dy < -10)
     {
       Navigator.push(context, MaterialPageRoute(builder: (context) => SpendingAlerts()));
-
     }
   }
 

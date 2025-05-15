@@ -54,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     if (user != null) {
-      // Save session info
 
       final loginProvider = Provider.of<LoginProvider>(context, listen: false);
       loginProvider.login(email, password, _watchConnectivity);
@@ -182,6 +181,7 @@ class _LoginScreenState extends State<LoginScreen>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                   ),

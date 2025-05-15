@@ -1,29 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_track/model/transaction_model.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TransactionProvider with ChangeNotifier {
   List<TransactionModel> _transactions = [];
 
   List<TransactionModel> get transactions => _transactions;
 
-
   Future<void> addTransaction(Map<String, dynamic> newTransaction) async {
-    await FirebaseFirestore.instance.collection('transactions').add(newTransaction);
+    await FirebaseFirestore.instance
+        .collection('transactions')
+        .add(newTransaction);
 
     final txModel = TransactionModel.fromMap(newTransaction);
     _transactions.add(txModel);
     notifyListeners();
   }
 
-
   double get totalExpenses => _transactions
-      .where((t) => t.amount < 0)
+      .where((t) => t.type?.toLowerCase() == 'expense')
       .fold(0.0, (sum, t) => sum + t.amount);
+
   double get totalIncome => _transactions
-      .where((t) => t.amount > 0)
+      .where((t) => t.type?.toLowerCase() == 'income')
       .fold(0.0, (sum, t) => sum + t.amount);
-  double get totalAmount => totalIncome + totalExpenses;
+
+  double get totalAmount => totalIncome - totalExpenses;
 
   Map<String, List<TransactionModel>> get groupedTransactions {
     final Map<String, List<TransactionModel>> map = {};
@@ -34,20 +37,23 @@ class TransactionProvider with ChangeNotifier {
   }
 
   Future<void> fetchTransactionsFromFirebase() async {
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('userUID');
+
+    if (uid == null) {
+      return;
+    }
+
     final snapshot =
-        await FirebaseFirestore.instance.collection('transactions').get();
+        await FirebaseFirestore.instance
+            .collection('transactions')
+            .where('uid', isEqualTo: uid)
+            .get();
 
     _transactions =
-        snapshot.docs.map((doc) {
-          final data = doc.data();
-
-          return TransactionModel(
-            title: data['title'] ?? '',
-            amount: (data['amount'] ?? 0).toDouble(),
-            method: data['method'] ?? '',
-            date: data['date'] ?? '',
-          );
-        }).toList();
+        snapshot.docs
+            .map((doc) => TransactionModel.fromMap(doc.data()))
+            .toList();
 
     notifyListeners();
   }

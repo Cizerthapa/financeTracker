@@ -29,7 +29,7 @@ class TransactionModel {
       'amount': amount,
       'date': date,
       'method': method,
-      'type': type, // Add this line
+      'title': title,
     };
   }
 }
