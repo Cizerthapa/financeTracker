@@ -16,9 +16,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<TransactionProvider>(context, listen: false)
-        .fetchTransactionsFromFirebase()
-        .then((_) {
+    Provider.of<TransactionProvider>(
+      context,
+      listen: false,
+    ).fetchTransactionsFromFirebase().then((_) {
       setState(() => _isLoading = false);
     });
   }
@@ -41,70 +42,89 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         backgroundColor: const Color(0xff0077A3),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : grouped.isEmpty
-          ? const Center(
-        child: Text(
-          'No transaction history available.',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-      )
-          : ListView(
-        children: grouped.entries.map((entry) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : grouped.isEmpty
+              ? const Center(
                 child: Text(
-                  entry.key,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  'No transaction history available.',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-              ),
-              ...entry.value.map((tx) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
+              )
+              : ListView(
+                children:
+                    grouped.entries.map((entry) {
+                      return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            tx.title,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            child: Text(
+                              entry.key,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            tx.method,
-                            style: TextStyle(color: Colors.grey[600]),
+                          ...entry.value.map(
+                            (tx) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          tx.title,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          tx.method,
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      '${tx.type == 'Income' ? '▲' : '▼'} \$${tx.amount.abs().toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color:
+                                            tx.type == 'Income'
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ],
-                      ),
-                      Text(
-                        "${tx.type == 'Income' ? '▲' : '▼'} \$${tx.amount.abs().toStringAsFixed(2)}",
-                        style: TextStyle(
-                          color: tx.type == 'Income' ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )),
-            ],
-          );
-        }).toList(),
-      ),
+                      );
+                    }).toList(),
+              ),
     );
   }
 }

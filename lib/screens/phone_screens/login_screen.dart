@@ -15,9 +15,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-{
-
+class _LoginScreenState extends State<LoginScreen> {
   late WatchConnectivity _watchConnectivity;
   final FirebaseAuthService _auth = FirebaseAuthService();
   final TextEditingController _emailController = TextEditingController();
@@ -54,25 +52,20 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     if (user != null) {
-
       final loginProvider = Provider.of<LoginProvider>(context, listen: false);
       loginProvider.login(email, password, _watchConnectivity);
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Sign in successful!")));
+      ).showSnackBar(const SnackBar(content: Text('Sign in successful!')));
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
       );
-
-
-    }
-    else
-    {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sign in failed. Please try again.")),
+        const SnackBar(content: Text('Sign in failed. Please try again.')),
       );
     }
   }
@@ -202,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Don’t have an account? ",
+                      'Don’t have an account? ',
                       style: TextStyle(color: Colors.white),
                     ),
                     TextButton(
@@ -232,7 +225,4 @@ class _LoginScreenState extends State<LoginScreen>
       ),
     );
   }
-
-
-
 }

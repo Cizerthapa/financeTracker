@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../firebase_auth_implementation/firebase_auth_services.dart';
 import 'login_screen.dart';
 
-
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -156,7 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Already have an account? ",
+                      'Already have an account? ',
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     TextButton(
@@ -229,9 +228,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'phone': phone,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Registration successful!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Registration successful!')));
 
       Navigator.push(
         context,
@@ -239,9 +238,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Registration failed. Try again.")),
+        SnackBar(content: Text('Registration failed. Try again.')),
       );
     }
   }
-
 }

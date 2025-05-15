@@ -11,47 +11,55 @@ class BillReminderPage extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Add Bill Reminder"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Add Bill Reminder'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(labelText: 'Title'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: amountController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(labelText: 'Amount'),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Amount'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final title = titleController.text.trim();
-              final amount = double.tryParse(amountController.text.trim()) ?? 0.0;
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  final title = titleController.text.trim();
+                  final amount =
+                      double.tryParse(amountController.text.trim()) ?? 0.0;
 
-              if (title.isNotEmpty && amount > 0) {
-                Provider.of<BillReminderProvider>(context, listen: false)
-                    .addReminder(BillReminder(title: title, amount: amount));
-                Navigator.pop(context);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter valid title and amount')),
-                );
-              }
-            },
-            child: const Text("Add"),
+                  if (title.isNotEmpty && amount > 0) {
+                    Provider.of<BillReminderProvider>(
+                      context,
+                      listen: false,
+                    ).addReminder(BillReminder(title: title, amount: amount));
+                    Navigator.pop(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter valid title and amount'),
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Add'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -80,7 +88,7 @@ class BillReminderPage extends StatelessWidget {
         foregroundColor: const Color(0xFF0B2E38),
         onPressed: () => _showAddReminderDialog(context),
         icon: const Icon(Icons.add),
-        label: const Text("Add Reminder"),
+        label: const Text('Add Reminder'),
       ),
     );
   }

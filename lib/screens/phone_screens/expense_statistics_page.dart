@@ -70,11 +70,15 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
               const SizedBox(width: 8),
               Text(
                 formattedMonthYear,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
-        )
+        ),
       ),
       body: Column(
         children: [
@@ -90,14 +94,15 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
 
               final totalBudgetSet = snapshot.data ?? 0.0;
               final totalSpend = statsProvider.totalExpenses;
-              final progress = totalBudgetSet > 0 ? totalSpend / totalBudgetSet : 0.0;
+              final progress =
+                  totalBudgetSet > 0 ? totalSpend / totalBudgetSet : 0.0;
 
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
                     // const Text(
-                    //   "Progress",
+                    //   'Progress',
                     //   style: TextStyle(fontWeight: FontWeight.bold),
                     // ),
                     // const SizedBox(height: 8),
@@ -112,7 +117,7 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
                     // ),
                     // const SizedBox(height: 16),
                     // Text(
-                    //   "Spent: \$${totalSpend.toStringAsFixed(2)} / Total Budget: \$${totalBudgetSet.toStringAsFixed(2)}",
+                    //   'Spent: \$${totalSpend.toStringAsFixed(2)} / Total Budget: \$${totalBudgetSet.toStringAsFixed(2)}',
                     //   style: const TextStyle(
                     //       color: Colors.black, fontWeight: FontWeight.bold),
                     // ),
@@ -154,7 +159,7 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text("${percentage.toStringAsFixed(0)}%"),
+                            Text('${percentage.toStringAsFixed(0)}%'),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -163,7 +168,9 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
                           child: LinearProgressIndicator(
                             value: percentage / 100,
                             backgroundColor: Colors.grey.shade300,
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xff0b2e38)),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xff0b2e38),
+                            ),
                             minHeight: 8,
                           ),
                         ),
