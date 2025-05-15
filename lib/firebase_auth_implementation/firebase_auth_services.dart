@@ -15,7 +15,7 @@ class FirebaseAuthService {
       );
       return credential.user;
     } catch (e) {
-      debugPrint("Error Occured" + e.toString());
+      debugPrint('Error Occured' + e.toString());
     }
     return null;
   }
@@ -31,7 +31,7 @@ class FirebaseAuthService {
       );
       return credential.user;
     } catch (e) {
-      debugPrint("Error Occured" + e.toString());
+      debugPrint('Error Occured' + e.toString());
     }
     return null;
   }

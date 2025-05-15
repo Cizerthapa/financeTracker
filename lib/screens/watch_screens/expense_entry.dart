@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,17 +12,15 @@ class ExpenseEntry extends StatefulWidget {
 }
 
 class _ExpenseEntryState extends State<ExpenseEntry> {
-  void handleSwipe(BuildContext context, DragUpdateDetails details)
-  {
+  void handleSwipe(BuildContext context, DragUpdateDetails details) {
     double dx = details.delta.dx;
-    if (dx < -10)
-    {
+    if (dx < -10) {
       Navigator.of(context).pop();
     }
   }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: GestureDetector(
         onPanUpdate: (details) => handleSwipe(context, details),
@@ -37,47 +34,63 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               child: Center(
                 child: Column(
                   children: [
-                    Text("Spending Alerts",
+                    Text(
+                      'Spending Alerts',
                       style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold
-                      ),),
-                    SizedBox(
-                      height: 3,
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    SizedBox(height: 3),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal:25, vertical: 6),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 25,
+                          vertical: 6,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
                       ),
                       onPressed: () {
-                       Navigator.push(context, MaterialPageRoute(builder: (context) => Categories()));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Categories()),
+                        );
                       },
                       child: Row(
-                        mainAxisSize: MainAxisSize.min, // Adjust size based on content
+                        mainAxisSize:
+                            MainAxisSize.min, // Adjust size based on content
                         children: [
-                          Icon(Icons.tag_rounded, size: 16, color: Colors.black87),
-            
+                          Icon(
+                            Icons.tag_rounded,
+                            size: 16,
+                            color: Colors.black87,
+                          ),
+
                           Text(
                             'Categories',
-                            style: TextStyle(fontSize: 12, color: Colors.black87),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black87,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 2,),
+                    SizedBox(height: 2),
                     Center(
                       child: Row(
-                        children:
-                        [
+                        children: [
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
@@ -86,23 +99,35 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                               print('Button Pressed');
                             },
                             child: Row(
-                              mainAxisSize: MainAxisSize.min, // Adjust size based on content
+                              mainAxisSize:
+                                  MainAxisSize
+                                      .min, // Adjust size based on content
                               children: [
-                                Icon(Icons.check_box_outline_blank, size: 14, color: Colors.black87),
+                                Icon(
+                                  Icons.check_box_outline_blank,
+                                  size: 14,
+                                  color: Colors.black87,
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   'Income',
-                                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black87,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(width: 10,),
-            
+                          SizedBox(width: 10),
+
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
@@ -111,60 +136,72 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                               print('Button Pressed');
                             },
                             child: Row(
-                              mainAxisSize: MainAxisSize.min, // Adjust size based on content
+                              mainAxisSize:
+                                  MainAxisSize
+                                      .min, // Adjust size based on content
                               children: [
-                                Icon(Icons.check_box_outline_blank, size: 14, color: Colors.black87),
+                                Icon(
+                                  Icons.check_box_outline_blank,
+                                  size: 14,
+                                  color: Colors.black87,
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   'Expenses',
-                                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black87,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-            
                         ],
                       ),
                     ),
                     SizedBox(height: 5),
                     Center(
                       child: Row(
-                        children:
-                        [
+                        children: [
                           Container(
-            
                             decoration: BoxDecoration(
                               color: Colors.white, // Set background color here
-                              borderRadius: BorderRadius.circular(5),  // Set the border radius here
+                              borderRadius: BorderRadius.circular(
+                                5,
+                              ), // Set the border radius here
                             ),
                             child: SizedBox(
                               width: 155,
                               height: 35,
-            
+
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.attach_money_outlined, size: 16, color: Colors.black87),
+                                  Icon(
+                                    Icons.attach_money_outlined,
+                                    size: 16,
+                                    color: Colors.black87,
+                                  ),
                                   SizedBox(width: 1),
-                                  Text(
-                                    "0",
-                                  )
-            
+                                  Text('0'),
                                 ],
                               ),
                             ),
                           ),
-            
-                          SizedBox(width: 3,),
-            
-                          InkWell
-                            (
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => Calculator()));
+
+                          SizedBox(width: 3),
+
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Calculator(),
+                                ),
+                              );
                             },
-                              child: Icon(Icons.calculate_sharp, size: 28,)),
-            
-            
+                            child: Icon(Icons.calculate_sharp, size: 28),
+                          ),
                         ],
                       ),
                     ),
@@ -172,7 +209,10 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black87,
-                        padding: EdgeInsets.symmetric(horizontal:25, vertical: 6),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 25,
+                          vertical: 6,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -181,9 +221,9 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                         print('Button Pressed');
                       },
                       child: Row(
-                        mainAxisSize: MainAxisSize.min, // Adjust size based on content
+                        mainAxisSize:
+                            MainAxisSize.min, // Adjust size based on content
                         children: [
-            
                           Text(
                             'Done',
                             style: TextStyle(fontSize: 12, color: Colors.white),
@@ -192,7 +232,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                       ),
                     ),
                   ],
-                )
+                ),
               ),
             ),
           ),

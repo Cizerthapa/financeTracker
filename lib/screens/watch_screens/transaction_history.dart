@@ -11,11 +11,9 @@ class TransactionHistory extends StatefulWidget {
 }
 
 class _TransactionHistoryState extends State<TransactionHistory> {
-  void handleSwipe(BuildContext context, DragUpdateDetails details)
-  {
+  void handleSwipe(BuildContext context, DragUpdateDetails details) {
     double dx = details.delta.dx;
-    if (dx < 10)
-    {
+    if (dx < 10) {
       Navigator.of(context).pop();
     }
   }
@@ -24,7 +22,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   void initState() {
     super.initState();
 
-    Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase();
+    Provider.of<TransactionProvider>(
+      context,
+      listen: false,
+    ).fetchTransactionsFromFirebase();
   }
 
   @override
@@ -32,11 +33,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
     final provider = Provider.of<TransactionProvider>(context);
     final groupedTx = provider.groupedTransactions;
     return Scaffold(
-
       body: GestureDetector(
         onPanUpdate: (details) => handleSwipe(context, details),
         child: Container(
-        color: Color(0xFF1D85B1),
+          color: Color(0xFF1D85B1),
           width: double.infinity,
           height: double.infinity,
           child: Padding(
@@ -44,11 +44,11 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             child: Column(
               children: [
                 Text(
-                  "Dec, 2025",
+                  'Dec, 2025',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
                 ),
                 Center(
@@ -57,61 +57,74 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     child: ListView(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      children: groupedTx.entries
-                          .expand((entry) => entry.value)
-
-                          .map((item) {
-                        return Padding(
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        item.title,
-                                        style: TextStyle(fontSize: 10, color: Colors.black),
+                      children:
+                          groupedTx.entries.expand((entry) => entry.value).map((
+                            item,
+                          ) {
+                            return Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0),
                                       ),
-                                      Spacer(),
-                                      Row(
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 2,
+                                      ),
+                                      child: Row(
                                         children: [
-                                          Icon(
-                                            item.amount < 0
-                                                ? Icons.arrow_drop_down_sharp
-                                                : Icons.arrow_drop_up_sharp,
-                                            color: item.amount < 0 ? Colors.red : Colors.green,
-                                          ),
                                           Text(
-                                            '\$${item.amount.abs().toStringAsFixed(2)}',
+                                            item.title,
                                             style: TextStyle(
                                               fontSize: 10,
-                                              color: item.amount < 0 ? Colors.red : Colors.green,
+                                              color: Colors.black,
                                             ),
+                                          ),
+                                          Spacer(),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                item.amount < 0
+                                                    ? Icons
+                                                        .arrow_drop_down_sharp
+                                                    : Icons.arrow_drop_up_sharp,
+                                                color:
+                                                    item.amount < 0
+                                                        ? Colors.red
+                                                        : Colors.green,
+                                              ),
+                                              Text(
+                                                '\$${item.amount.abs().toStringAsFixed(2)}',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color:
+                                                      item.amount < 0
+                                                          ? Colors.red
+                                                          : Colors.green,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
                     ),
                   ),
                 ),
-
               ],
             ),
-          )
+          ),
         ),
       ),
     );
