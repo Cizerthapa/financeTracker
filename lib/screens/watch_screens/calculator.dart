@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 
+import '../../providers/login_provider.dart';
 import 'expense_entry.dart';
 
 class Calculator extends StatefulWidget {
@@ -11,7 +14,22 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  void handleSwipe(BuildContext context, DragUpdateDetails details) {
+
+  late WatchConnectivity watchConnectivity;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    watchConnectivity = WatchConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+    });
+
+  }
+
+  void handleSwipe(BuildContext context, DragUpdateDetails details)
+  {
+
     double dx = details.delta.dx;
     if (dx < -10) {
       Navigator.of(context).pop();

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 
 class AddTransactionPage extends StatefulWidget {
   @override
@@ -40,7 +41,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       });
     }
   }
-
+  late WatchConnectivity _watchConnectivity = WatchConnectivity();
   Future<void> _saveTransaction() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -77,6 +78,10 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Transaction saved!')));
 
+      //For Watch Notification
+      sendNotification("New " +_titleController.text.trim() + " " + _selectedType + " is Added!");
+      //
+
       Navigator.pop(context);
     } catch (e) {
       print('Error: $e');
@@ -87,6 +92,31 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     setState(() => _isSaving = false);
   }
+
+
+
+  void sendNotification(var name) async {
+    if (await _watchConnectivity.isReachable)
+    {
+      try {
+        await _watchConnectivity.sendMessage({
+          "notification": name,
+        });
+        print("Message sent to Mobile O");
+      }
+      catch (e)
+      {
+        print("Failed to send message: $e");
+
+      }
+    }
+    else
+    {
+      print("Mobile OS device is not reachable");
+
+    }
+  }
+
 
   @override
   void initState() {

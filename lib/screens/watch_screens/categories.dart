@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
+
+import '../../providers/login_provider.dart';
 
 class Categories extends StatefulWidget {
   const Categories({super.key});
@@ -9,6 +13,19 @@ class Categories extends StatefulWidget {
 }
 
 class _CategoriesState extends State<Categories> {
+  late WatchConnectivity watchConnectivity;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    watchConnectivity = WatchConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+    });
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

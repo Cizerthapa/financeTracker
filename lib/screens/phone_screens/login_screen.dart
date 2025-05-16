@@ -29,7 +29,42 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _watchConnectivity = WatchConnectivity();
+
+    _watchConnectivity.messageStream.listen((message){
+
+      if(message["UserSession"])
+        {
+          isLogggedIn();
+
+        }
+      else
+        {
+          print("false login");
+        }
+    });
+
   }
+
+
+  void isLogggedIn() async {
+    if (await _watchConnectivity.isReachable) {
+      try {
+
+        await _watchConnectivity.sendMessage({
+          "auth_message": "Not Login",
+        });
+        print("Message sent to Mobile OS");
+      } catch (e) {
+        print("Failed to send message: $e");
+
+      }
+    } else {
+      print("Mobile OS device is not reachable");
+
+    }
+
+  }
+
 
   @override
   void dispose() {
@@ -39,6 +74,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _signIn() async {
+    setState(()
+    {
+      _isLoggingIn = true;
+    });
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoggingIn = true);
@@ -46,6 +86,16 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
+
+    setState(()
+    {
+      _isLoggingIn = false;
+    });
+
+    if (user != null)
+    {
+      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
+      loginProvider.login(email, password, _watchConnectivity);
 
       final user = await _auth.signInWithEmailAndPassword(email, password);
 
@@ -75,6 +125,15 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoggingIn = false);
       ScaffoldMessenger.of(
         context,
+
+        MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
+      );
+    }
+    else
+    {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Sign in failed. Please try again.")),
+      );
       ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
   }

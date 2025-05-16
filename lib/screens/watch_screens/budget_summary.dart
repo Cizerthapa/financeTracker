@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
+
+import '../../providers/login_provider.dart';
 
 class BudgetSummary extends StatefulWidget {
   const BudgetSummary({super.key});
@@ -14,10 +18,16 @@ class _BudgetSummaryState extends State<BudgetSummary> {
       Navigator.of(context).pop();
     }
   }
-
+  late WatchConnectivity watchConnectivity;
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
+    watchConnectivity = WatchConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+    });
+
   }
 
   @override

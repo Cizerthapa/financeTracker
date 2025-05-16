@@ -2,6 +2,9 @@ import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
+
+import '../../providers/login_provider.dart';
 
 class TransactionHistory extends StatefulWidget {
   const TransactionHistory({super.key});
@@ -17,17 +20,25 @@ class _TransactionHistoryState extends State<TransactionHistory> {
       Navigator.of(context).pop();
     }
   }
-
+  late WatchConnectivity watchConnectivity;
   @override
   void initState() {
     super.initState();
+    watchConnectivity = WatchConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+    });
+    Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase();
 
-    Provider.of<TransactionProvider>(
-      context,
-      listen: false,
-    ).fetchTransactionsFromFirebase();
   }
 
+  @override
+  void didChangeDependencies() async
+  {
+    super.didChangeDependencies();
+    watchConnectivity = WatchConnectivity();
+    Provider.of<LoginProvider>(context).wearOsLogout(watchConnectivity, context);
+  }
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
@@ -51,16 +62,19 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     fontSize: 14,
                   ),
                 ),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      children:
-                          groupedTx.entries.expand((entry) => entry.value).map((
-                            item,
-                          ) {
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: ListView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: groupedTx.entries
+                              .expand((entry) => entry.value)
+                    
+                              .map((item) {
+
                             return Padding(
                               padding: EdgeInsets.all(5),
                               child: Column(
@@ -68,23 +82,33 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                   Container(
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10.0),
-                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 2,
-                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                                       child: Row(
                                         children: [
                                           Text(
                                             item.title,
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.black,
-                                            ),
+                                            style: TextStyle(fontSize: 10, color: Colors.black),
+                                          ),
+                                          Spacer(),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                item.type != 'Income'
+                                                    ? Icons.arrow_drop_down_sharp
+                                                    : Icons.arrow_drop_up_sharp,
+                                                color: item.type != 'Income' ? Colors.red : Colors.green,
+                                              ),
+                                              Text(
+                                                '\$${item.amount.abs().toStringAsFixed(2)}',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: item.type != 'Income' ? Colors.red : Colors.green,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                           Spacer(),
                                           Row(
@@ -119,6 +143,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                               ),
                             );
                           }).toList(),
+                        ),
+                      ),
                     ),
                   ),
                 ),

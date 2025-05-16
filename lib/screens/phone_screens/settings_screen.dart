@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 import '../../providers/login_provider.dart';
 import '../../providers/theme_provider.dart';
 
@@ -86,7 +87,10 @@ class SettingsPage extends StatelessWidget {
                     context,
                     listen: false,
                   );
-                  await loginProvider.logout();
+
+                  WatchConnectivity watchConnectivity = WatchConnectivity();
+
+                  await loginProvider.logout(watchConnectivity);
                   Navigator.pop(context);
 
                   Navigator.pushAndRemoveUntil(
