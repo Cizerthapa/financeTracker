@@ -9,11 +9,15 @@ class TransactionProvider with ChangeNotifier {
   List<TransactionModel> get transactions => _transactions;
 
   Future<void> addTransaction(Map<String, dynamic> newTransaction) async {
-    await FirebaseFirestore.instance
+    final docRef = await FirebaseFirestore.instance
         .collection('transactions')
         .add(newTransaction);
 
-    final txModel = TransactionModel.fromMap(newTransaction);
+    final txModel = TransactionModel.fromMap({
+      ...newTransaction,
+      'id': docRef.id,
+    });
+
     _transactions.add(txModel);
     notifyListeners();
   }
@@ -39,24 +43,30 @@ class TransactionProvider with ChangeNotifier {
   Future<void> fetchTransactionsFromFirebase() async {
     final prefs = await SharedPreferences.getInstance();
     final uid = prefs.getString('userUID');
-    print(uid! + "<-- THis is from");
 
-    if (uid == null)
-    {
-      return;
-    }
+    if (uid == null) return;
 
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('transactions')
-            .where('uid', isEqualTo: uid)
-            .get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('transactions')
+        .where('uid', isEqualTo: uid)
+        .get();
 
-    _transactions =
-        snapshot.docs
-            .map((doc) => TransactionModel.fromMap(doc.data()))
-            .toList();
+    _transactions = snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return TransactionModel.fromMap(data);
+    }).toList();
 
+    notifyListeners();
+  }
+
+  Future<void> deleteTransaction(String transactionId) async {
+    await FirebaseFirestore.instance
+        .collection('transactions')
+        .doc(transactionId)
+        .delete();
+
+    _transactions.removeWhere((tx) => tx.id == transactionId);
     notifyListeners();
   }
 }
