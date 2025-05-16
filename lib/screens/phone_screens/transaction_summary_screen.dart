@@ -65,7 +65,8 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
       } catch (e) {
         return false;
       }
-    }).toList();
+    }
+    ).toList();
 
     final groupedTx = <String, List<TransactionModel>>{};
     for (var tx in filteredTransactions) {

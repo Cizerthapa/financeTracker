@@ -16,11 +16,10 @@ class LoginSession with ChangeNotifier {
     _watchConnectivity.messageStream.listen((message) {
       if (message["UserSession"] == true) {
         _userLoggedIn = true;
-      } else {
-        _userLoggedIn = false;
+        print("Listen Mobile");
       }
 
-      notifyListeners(); // Notify UI to update when the session changes
+      notifyListeners();
     });
   }
 }

@@ -3,6 +3,7 @@ import 'package:finance_track/providers/expense_statistics_provider.dart';
 import 'package:finance_track/providers/home_provider.dart';
 import 'package:finance_track/providers/login_provider.dart';
 import 'package:finance_track/providers/login_session.dart';
+import 'package:finance_track/providers/notification_provider.dart';
 import 'package:finance_track/providers/profile_provider.dart';
 import 'package:finance_track/providers/registerProvider.dart';
 import 'package:finance_track/providers/theme_provider.dart';
@@ -36,7 +37,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => ExpenseStatisticsProvider()),
         ChangeNotifierProvider(create: (_) => BillReminderProvider()),
-        ChangeNotifierProvider(create: (_) => LoginSession())
+        ChangeNotifierProvider(create: (_) => LoginSession()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: MyApp(isWear: isWears),
     ),

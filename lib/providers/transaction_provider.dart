@@ -37,8 +37,10 @@ class TransactionProvider with ChangeNotifier {
   Future<void> fetchTransactionsFromFirebase() async {
     final prefs = await SharedPreferences.getInstance();
     final uid = prefs.getString('userUID');
+    print(uid! + "<-- THis is from");
 
-    if (uid == null) {
+    if (uid == null)
+    {
       return;
     }
 

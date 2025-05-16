@@ -1,4 +1,5 @@
 
+import 'package:finance_track/providers/notification_provider.dart';
 import 'package:finance_track/screens/watch_screens/spending_alerts.dart';
 import 'package:finance_track/screens/watch_screens/transaction_history.dart';
 import 'package:flutter/cupertino.dart';
@@ -42,24 +43,50 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
   }
 
   late WatchConnectivity watchConnectivity;
+  bool _isLoading = true;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase();
+
     watchConnectivity = WatchConnectivity();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      if(!_isInitialized)
+        {
+          Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase()
+      .then((_) {
+      setState(() {
+      _isLoading = false;
+      _isInitialized = true;
+      });
+      });
+        }
+
       Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
     });
 
-
   }
 
-
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+
+    final notification = context.watch<NotificationProvider>().notification;
+
+    print("Notification: $notification");
+  }
+
+    @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
     final groupedTx = provider.groupedTransactions;
+
+
+
     return Scaffold(
       backgroundColor: Color(0xFF1D85B1),
       body: GestureDetector(
@@ -93,7 +120,7 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                             ),
                           ),
                           Text(
-                            '\$30,000',
+                            'Rs. 0.0',
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold
@@ -110,57 +137,61 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
-                child: ListView(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: groupedTx.entries
-                      .expand((entry) => entry.value)
-                      .take(2)
-                      .map((item) {
-                    return Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    item.title,
-                                    style: TextStyle(fontSize: 10, color: Colors.black),
-                                  ),
-                                  Spacer(),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        item.amount < 0
-                                            ? Icons.arrow_drop_down_sharp
-                                            : Icons.arrow_drop_up_sharp,
-                                        color: item.amount < 0 ? Colors.red : Colors.green,
-                                      ),
-                                      Text(
-                                        '\$${item.amount.abs().toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: item.amount < 0 ? Colors.red : Colors.green,
+                child: Expanded(
+                  child: groupedTx.isEmpty
+                      ? const Center(child: Text("Nothing to show", style: TextStyle(color: Colors.white, fontSize: 12)))
+                      :ListView(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: groupedTx.entries
+                        .expand((entry) => entry.value)
+                        .take(2)
+                        .map((item) {
+                      return Padding(
+                        padding: EdgeInsets.all(5),
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      item.title,
+                                      style: TextStyle(fontSize: 10, color: Colors.black),
+                                    ),
+                                    Spacer(),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          item.type != 'Income'
+                                              ? Icons.arrow_drop_down_sharp
+                                              : Icons.arrow_drop_up_sharp,
+                                          color: item.type != 'Income' ? Colors.red : Colors.green,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        Text(
+                                          '\$${item.amount.abs().toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: item.type != 'Income' ? Colors.red : Colors.green,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
 
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
             ),
@@ -202,7 +233,7 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                           ),
                         ),
                         Text(
-                          '\$30,000',
+                          'Rs. 0.0',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

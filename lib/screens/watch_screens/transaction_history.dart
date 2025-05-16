@@ -64,60 +64,64 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                       fontSize: 14
                   ),
                 ),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      children: groupedTx.entries
-                          .expand((entry) => entry.value)
-
-                          .map((item) {
-                        return Padding(
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        item.title,
-                                        style: TextStyle(fontSize: 10, color: Colors.black),
-                                      ),
-                                      Spacer(),
-                                      Row(
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: ListView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: groupedTx.entries
+                              .expand((entry) => entry.value)
+                    
+                              .map((item) {
+                            return Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                                      child: Row(
                                         children: [
-                                          Icon(
-                                            item.amount < 0
-                                                ? Icons.arrow_drop_down_sharp
-                                                : Icons.arrow_drop_up_sharp,
-                                            color: item.amount < 0 ? Colors.red : Colors.green,
-                                          ),
                                           Text(
-                                            '\$${item.amount.abs().toStringAsFixed(2)}',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: item.amount < 0 ? Colors.red : Colors.green,
-                                            ),
+                                            item.title,
+                                            style: TextStyle(fontSize: 10, color: Colors.black),
+                                          ),
+                                          Spacer(),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                item.type != 'Income'
+                                                    ? Icons.arrow_drop_down_sharp
+                                                    : Icons.arrow_drop_up_sharp,
+                                                color: item.type != 'Income' ? Colors.red : Colors.green,
+                                              ),
+                                              Text(
+                                                '\$${item.amount.abs().toStringAsFixed(2)}',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: item.type != 'Income' ? Colors.red : Colors.green,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                    
+                                ],
                               ),
-
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
                   ),
                 ),

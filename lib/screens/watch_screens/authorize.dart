@@ -1,6 +1,7 @@
 import 'package:finance_track/screens/watch_screens/watchwearos_homescreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 class Authorize extends StatefulWidget {
@@ -26,7 +27,7 @@ class _AuthorizeState extends State<Authorize> {
     _watchConnectivity = WatchConnectivity();
 
     // Listen to messages from the watch after initialization
-    _watchConnectivity.messageStream.listen((message) {
+    _watchConnectivity.messageStream.listen((message) async {
       setState(() {
       if(message["auth_message"].toString().isNotEmpty)
         {
@@ -34,6 +35,10 @@ class _AuthorizeState extends State<Authorize> {
         }
       });
       if (message["Accessed"] == true && message["uid"].toString().isNotEmpty) {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        prefs.setString('userUID', message["uid"]);
+
         print(message["uid"].toString());
         Navigator.push(
           context,
