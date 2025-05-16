@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../firebase_auth_implementation/firebase_auth_services.dart';
-
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -21,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuthService _auth = FirebaseAuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // Moved this above its usage
 
   bool _obscureText = true;
   bool _isLoggingIn = false;
@@ -30,41 +30,30 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _watchConnectivity = WatchConnectivity();
 
-    _watchConnectivity.messageStream.listen((message){
-
-      if(message["UserSession"])
-        {
-          isLogggedIn();
-
-        }
-      else
-        {
-          print("false login");
-        }
-    });
-
-  }
-
-
-  void isLogggedIn() async {
-    if (await _watchConnectivity.isReachable) {
-      try {
-
-        await _watchConnectivity.sendMessage({
-          "auth_message": "Not Login",
-        });
-        print("Message sent to Mobile OS");
-      } catch (e) {
-        print("Failed to send message: $e");
-
+    _watchConnectivity.messageStream.listen((message) {
+      if (message["UserSession"] == true) {
+        isLoggedIn();
+      } else {
+        print("false login");
       }
-    } else {
-      print("Mobile OS device is not reachable");
-
-    }
-
+    });
   }
 
+  void isLoggedIn() async {
+    try {
+      if (await _watchConnectivity.isSupported &&
+          await _watchConnectivity.isReachable) {
+        await _watchConnectivity.sendMessage({"auth_message": "Not Login"});
+        print("Message sent to Mobile OS");
+      } else {
+        print(
+          "WatchConnectivity not supported or not reachable on this device",
+        );
+      }
+    } catch (e) {
+      print("WatchConnectivity error: $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -74,11 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _signIn() async {
-    setState(()
-    {
-      _isLoggingIn = true;
-    });
-
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoggingIn = true);
@@ -86,16 +70,6 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
-
-    setState(()
-    {
-      _isLoggingIn = false;
-    });
-
-    if (user != null)
-    {
-      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
-      loginProvider.login(email, password, _watchConnectivity);
 
       final user = await _auth.signInWithEmailAndPassword(email, password);
 
@@ -125,20 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoggingIn = false);
       ScaffoldMessenger.of(
         context,
-
-        MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
-      );
-    }
-    else
-    {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sign in failed. Please try again.")),
-      );
       ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
   }
-
-  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(height: 8),
-
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -192,13 +154,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
                       const Text(
                         'Password',
                         style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(height: 8),
-
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscureText,
