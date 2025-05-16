@@ -1,7 +1,6 @@
 import 'package:finance_track/providers/login_provider.dart';
 import 'package:finance_track/screens/phone_screens/settings_screen.dart';
 import 'package:finance_track/screens/phone_screens/transaction_history.dart';
-import 'package:finance_track/screens/watch_screens/transaction_history.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -147,7 +146,9 @@ class ProfilePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => TransactionHistoryPage()),
+                    MaterialPageRoute(
+                      builder: (context) => TransactionHistoryPage(),
+                    ),
                   );
                 },
               ),
@@ -172,12 +173,13 @@ class ProfilePage extends StatelessWidget {
                   await provider_log.logout();
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
-                        (Route<dynamic> route) => false,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                    (Route<dynamic> route) => false,
                   );
                 },
               ),
-
 
               const SizedBox(height: 12),
               const Text(

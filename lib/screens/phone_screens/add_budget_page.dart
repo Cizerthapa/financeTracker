@@ -1,7 +1,6 @@
 import 'package:finance_track/providers/expense_statistics_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddBudgetPage extends StatefulWidget {
   const AddBudgetPage({super.key});
@@ -39,8 +38,13 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
   }
 
   void _saveBudget() async {
-    if (_formKey.currentState!.validate() && _startDate != null && _endDate != null) {
-      await Provider.of<ExpenseStatisticsProvider>(context, listen: false).addBudget(
+    if (_formKey.currentState!.validate() &&
+        _startDate != null &&
+        _endDate != null) {
+      await Provider.of<ExpenseStatisticsProvider>(
+        context,
+        listen: false,
+      ).addBudget(
         _categoryController.text.trim(),
         double.parse(_amountController.text.trim()),
         _startDate!,
@@ -64,17 +68,21 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
               TextFormField(
                 controller: _categoryController,
                 decoration: const InputDecoration(labelText: 'Category'),
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Enter a category' : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Enter a category'
+                            : null,
               ),
               TextFormField(
                 controller: _amountController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Amount Limit'),
-                validator: (value) =>
-                value == null || double.tryParse(value) == null
-                    ? 'Enter a valid amount'
-                    : null,
+                validator:
+                    (value) =>
+                        value == null || double.tryParse(value) == null
+                            ? 'Enter a valid amount'
+                            : null,
               ),
               const SizedBox(height: 16),
               Row(
@@ -82,18 +90,22 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => _pickDate(isStart: true),
-                      child: Text(_startDate == null
-                          ? 'Select Start Date'
-                          : _startDate!.toLocal().toString().split(' ')[0]),
+                      child: Text(
+                        _startDate == null
+                            ? 'Select Start Date'
+                            : _startDate!.toLocal().toString().split(' ')[0],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => _pickDate(isStart: false),
-                      child: Text(_endDate == null
-                          ? 'Select End Date'
-                          : _endDate!.toLocal().toString().split(' ')[0]),
+                      child: Text(
+                        _endDate == null
+                            ? 'Select End Date'
+                            : _endDate!.toLocal().toString().split(' ')[0],
+                      ),
                     ),
                   ),
                 ],

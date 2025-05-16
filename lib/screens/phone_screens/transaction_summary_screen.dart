@@ -120,7 +120,7 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xff0077A3),
+        foregroundColor: Colors.black,
         onPressed: () {
           Navigator.push(
             context,

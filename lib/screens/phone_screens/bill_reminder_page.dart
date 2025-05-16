@@ -1,64 +1,187 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/bill_reminder_provider.dart';
+import 'package:finance_track/providers/bill_reminder_provider.dart';
 
-class BillReminderPage extends StatelessWidget {
+class BillReminderPage extends StatefulWidget {
   const BillReminderPage({super.key});
 
+  @override
+  State<BillReminderPage> createState() => _BillReminderPageState();
+}
+
+class _BillReminderPageState extends State<BillReminderPage> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<BillReminderProvider>(context, listen: false).fetchReminders();
+  }
+
   void _showAddReminderDialog(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
     final titleController = TextEditingController();
     final amountController = TextEditingController();
+    DateTime? startDate;
+    DateTime? dueDate;
+    String? dateErrorText;
+
+    Future<void> pickDate(
+      BuildContext context,
+      bool isStart,
+      void Function(void Function()) setState,
+    ) async {
+      final now = DateTime.now();
+      final picked = await showDatePicker(
+        context: context,
+        initialDate: now,
+        firstDate: now,
+        lastDate: DateTime(now.year + 5),
+      );
+      if (picked != null) {
+        setState(() {
+          if (isStart) {
+            startDate = picked;
+          } else {
+            dueDate = picked;
+          }
+        });
+      }
+    }
 
     showDialog(
       context: context,
       builder:
-          (_) => AlertDialog(
-            title: const Text('Add Bill Reminder'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(labelText: 'Title'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: amountController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: const InputDecoration(labelText: 'Amount'),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final title = titleController.text.trim();
-                  final amount =
-                      double.tryParse(amountController.text.trim()) ?? 0.0;
-
-                  if (title.isNotEmpty && amount > 0) {
-                    Provider.of<BillReminderProvider>(
-                      context,
-                      listen: false,
-                    ).addReminder(BillReminder(title: title, amount: amount));
-                    Navigator.pop(context);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please enter valid title and amount'),
+          (_) => StatefulBuilder(
+            builder:
+                (context, setState) => AlertDialog(
+                  title: const Text('Add Bill Reminder'),
+                  content: Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextFormField(
+                            controller: titleController,
+                            decoration: const InputDecoration(
+                              labelText: 'Title',
+                            ),
+                            validator:
+                                (val) =>
+                                    val == null || val.isEmpty
+                                        ? 'Title is required'
+                                        : null,
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: amountController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: const InputDecoration(
+                              labelText: 'Amount',
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Amount is required';
+                              }
+                              final amount = double.tryParse(value);
+                              if (amount == null || amount <= 0) {
+                                return 'Enter a valid amount';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: () => pickDate(context, true, setState),
+                            icon: const Icon(Icons.date_range),
+                            label: Text(
+                              startDate == null
+                                  ? 'Pick Start Date'
+                                  : 'Start: ${startDate!.toLocal().toString().split(' ')[0]}',
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: () => pickDate(context, false, setState),
+                            icon: const Icon(Icons.event),
+                            label: Text(
+                              dueDate == null
+                                  ? 'Pick Due Date'
+                                  : 'Due: ${dueDate!.toLocal().toString().split(' ')[0]}',
+                            ),
+                          ),
+                          if (startDate != null &&
+                              dueDate != null &&
+                              dueDate!.isBefore(startDate!))
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8),
+                              child: Text(
+                                'Due date must be after start date.',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          if (dateErrorText != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                dateErrorText!,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                    );
-                  }
-                },
-                child: const Text('Add'),
-              ),
-            ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        FocusScope.of(context).unfocus();
+                        if (_formKey.currentState!.validate()) {
+                          if (startDate == null || dueDate == null) {
+                            setState(() {
+                              dateErrorText = 'Please select both dates';
+                            });
+                          } else if (dueDate!.isBefore(startDate!)) {
+                            setState(() {
+                              dateErrorText =
+                                  'Due date must be after start date';
+                            });
+                          } else {
+                            final title = titleController.text.trim();
+                            final amount = double.parse(
+                              amountController.text.trim(),
+                            );
+
+                            Provider.of<BillReminderProvider>(
+                              context,
+                              listen: false,
+                            ).addReminder(
+                              BillReminder(
+                                title: title,
+                                amount: amount,
+                                startDate: startDate!,
+                                dueDate: dueDate!,
+                              ),
+                            );
+                            Navigator.pop(context);
+                          }
+                        }
+                      },
+                      child: const Text('Add'),
+                    ),
+                  ],
+                ),
           ),
     );
   }
@@ -75,14 +198,22 @@ class BillReminderPage extends StatelessWidget {
         title: const Text('Bill Reminder'),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: reminders.length,
-        itemBuilder: (context, index) {
-          final reminder = reminders[index];
-          return _BillCard(title: reminder.title, amount: reminder.amount);
-        },
-      ),
+      body:
+          reminders.isEmpty
+              ? const Center(child: Text('No reminders yet.'))
+              : ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: reminders.length,
+                itemBuilder: (context, index) {
+                  final reminder = reminders[index];
+                  return _BillCard(
+                    title: reminder.title,
+                    amount: reminder.amount,
+                    startDate: reminder.startDate,
+                    dueDate: reminder.dueDate,
+                  );
+                },
+              ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF0B2E38),
@@ -97,8 +228,15 @@ class BillReminderPage extends StatelessWidget {
 class _BillCard extends StatelessWidget {
   final String title;
   final double amount;
+  final DateTime startDate;
+  final DateTime dueDate;
 
-  const _BillCard({required this.title, required this.amount});
+  const _BillCard({
+    required this.title,
+    required this.amount,
+    required this.startDate,
+    required this.dueDate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +254,7 @@ class _BillCard extends StatelessWidget {
             title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             '\$${amount.toStringAsFixed(2)}',
             style: const TextStyle(
@@ -125,6 +263,9 @@ class _BillCard extends StatelessWidget {
               color: Color(0xFF0B2E38),
             ),
           ),
+          const SizedBox(height: 8),
+          Text('Start Date: ${startDate.toLocal().toString().split(' ')[0]}'),
+          Text('Due Date: ${dueDate.toLocal().toString().split(' ')[0]}'),
         ],
       ),
     );
