@@ -1,9 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/expense_statistics_provider.dart'; // Ensure this path is correct
+import 'package:intl/intl.dart';
+import '../../providers/expense_statistics_provider.dart';
+import 'add_budget_page.dart';
 
-class ExpenseStatisticsPage extends StatelessWidget {
+class ExpenseStatisticsPage extends StatefulWidget {
   const ExpenseStatisticsPage({super.key});
+
+  @override
+  State<ExpenseStatisticsPage> createState() => _ExpenseStatisticsPageState();
+}
+
+class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
+  DateTime selectedDate = DateTime.now();
+
+  @override
+  void initState() {
+    context.read<ExpenseStatisticsProvider>().fetchBudgets();
+    super.initState();
+  }
+
+  Future<void> _pickMonthYear() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(primary: Color(0xff0077A3)),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+
+      // Optionally update stats provider here
+      // context.read<ExpenseStatisticsProvider>().fetchBudgetsForMonth(picked);
+    }
+  }
+
+  String get formattedMonthYear {
+    return DateFormat('MMMM, yyyy').format(selectedDate);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,54 +61,81 @@ class ExpenseStatisticsPage extends StatelessWidget {
         backgroundColor: const Color(0xff0077A3),
         elevation: 0,
         centerTitle: true,
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.arrow_back_ios, size: 16),
-            SizedBox(width: 4),
-            Text("December, 2024"),
-            SizedBox(width: 4),
-            Icon(Icons.arrow_forward_ios, size: 16),
-          ],
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.filter_alt_outlined),
+        title: GestureDetector(
+          onTap: _pickMonthYear,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.calendar_month, size: 20, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(
+                formattedMonthYear,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       body: Column(
         children: [
-          // Summary Section
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                SummaryItem(
-                  label: "Expenses",
-                  amount: "\$${statsProvider.totalExpenses.toStringAsFixed(2)}",
+          FutureBuilder<double>(
+            future: statsProvider.getTotalBudgetSet(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              final totalBudgetSet = snapshot.data ?? 0.0;
+              final totalSpend = statsProvider.totalExpenses;
+              final progress =
+                  totalBudgetSet > 0 ? totalSpend / totalBudgetSet : 0.0;
+
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // const Text(
+                    //   'Progress',
+                    //   style: TextStyle(fontWeight: FontWeight.bold),
+                    // ),
+                    // const SizedBox(height: 8),
+                    // ClipRRect(
+                    //   borderRadius: BorderRadius.circular(10),
+                    //   child: LinearProgressIndicator(
+                    //     value: progress,
+                    //     backgroundColor: Colors.grey.shade300,
+                    //     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xff0b2e38)),
+                    //     minHeight: 8,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 16),
+                    // Text(
+                    //   'Spent: \$${totalSpend.toStringAsFixed(2)} / Total Budget: \$${totalBudgetSet.toStringAsFixed(2)}',
+                    //   style: const TextStyle(
+                    //       color: Colors.black, fontWeight: FontWeight.bold),
+                    // ),
+                  ],
                 ),
-                SummaryItem(
-                  label: "Income",
-                  amount: "\$${statsProvider.totalIncome.toStringAsFixed(2)}",
-                ),
-                SummaryItem(
-                  label: "Total",
-                  amount: "\$${statsProvider.total.toStringAsFixed(2)}",
-                ),
-              ],
-            ),
+              );
+            },
           ),
 
-          // Category Breakdown
+          // Category List
           Expanded(
             child: ListView.builder(
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
+                final title = category['title'] ?? 'Untitled';
+                final percentage = 0.0;
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -78,28 +150,23 @@ class ExpenseStatisticsPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title and Percentage
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              category['title'],
+                              title,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(
-                              "${category['percentage'].toStringAsFixed(0)}%",
-                            ),
+                            Text('${percentage.toStringAsFixed(0)}%'),
                           ],
                         ),
                         const SizedBox(height: 8),
-
-                        // Progress Bar
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: LinearProgressIndicator(
-                            value: category['percentage'] / 100,
+                            value: percentage / 100,
                             backgroundColor: Colors.grey.shade300,
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               Color(0xff0b2e38),
@@ -115,6 +182,16 @@ class ExpenseStatisticsPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddBudgetPage()),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.black),
       ),
     );
   }

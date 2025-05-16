@@ -52,9 +52,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     if (uid == null) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in.')));
       return;
     }
 
@@ -69,12 +69,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     };
 
     try {
-      await Provider.of<TransactionProvider>(context, listen: false)
-          .addTransaction(newTx);
+      await Provider.of<TransactionProvider>(
+        context,
+        listen: false,
+      ).addTransaction(newTx);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Transaction saved!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Transaction saved!')));
 
       //For Watch Notification
       sendNotification("New " +_titleController.text.trim() + " " + _selectedType + " is Added!");
@@ -82,7 +84,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
       Navigator.pop(context);
     } catch (e) {
-      print("Error: $e");
+      print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to save transaction.')),
       );
@@ -139,17 +141,21 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 controller: _amountController,
                 decoration: const InputDecoration(labelText: 'Amount'),
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                value == null || value.isEmpty || double.tryParse(value) == null
-                    ? 'Enter a valid amount'
-                    : null,
+                validator:
+                    (value) =>
+                        value == null ||
+                                value.isEmpty ||
+                                double.tryParse(value) == null
+                            ? 'Enter a valid amount'
+                            : null,
               ),
 
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Enter a title' : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty ? 'Enter a title' : null,
               ),
 
               TextFormField(
@@ -164,9 +170,15 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
               DropdownButtonFormField<String>(
                 value: _selectedMethod,
-                items: _methods
-                    .map((method) => DropdownMenuItem(value: method, child: Text(method)))
-                    .toList(),
+                items:
+                    _methods
+                        .map(
+                          (method) => DropdownMenuItem(
+                            value: method,
+                            child: Text(method),
+                          ),
+                        )
+                        .toList(),
                 onChanged: (value) {
                   setState(() {
                     _selectedMethod = value!;
@@ -177,9 +189,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
               DropdownButtonFormField<String>(
                 value: _selectedType,
-                items: _types
-                    .map((type) => DropdownMenuItem(value: type, child: Text(type)))
-                    .toList(),
+                items:
+                    _types
+                        .map(
+                          (type) =>
+                              DropdownMenuItem(value: type, child: Text(type)),
+                        )
+                        .toList(),
                 onChanged: (value) {
                   setState(() {
                     _selectedType = value!;
@@ -193,13 +209,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               _isSaving
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
-                onPressed: _saveTransaction,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff0077A3),
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Save Transaction'),
-              ),
+                    onPressed: _saveTransaction,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff0077A3),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Save Transaction'),
+                  ),
             ],
           ),
         ),

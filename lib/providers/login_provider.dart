@@ -12,6 +12,7 @@ class LoginProvider with ChangeNotifier {
 
   Future<void> login(String email, String password, WatchConnectivity _watchConnectivity) async
   {
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
@@ -23,7 +24,10 @@ class LoginProvider with ChangeNotifier {
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setInt('loginTimestamp', DateTime.now().millisecondsSinceEpoch);
+        await prefs.setInt(
+          'loginTimestamp',
+          DateTime.now().millisecondsSinceEpoch,
+        );
         await prefs.setString('userUID', user.uid);
 
         isLoggedIN(_watchConnectivity);
