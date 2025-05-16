@@ -1,6 +1,8 @@
 
+import 'package:finance_track/screens/watch_screens/authorize.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 import '../watch_screens/watchwearos_homescreen.dart';
 
 import 'home_screen.dart';
@@ -15,10 +17,14 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+  late WatchConnectivity _watchConnectivity;
+
   @override
   void initState() {
     super.initState();
     _checkLoginStatus();
+    _watchConnectivity = WatchConnectivity();
   }
 
   Future<void> _checkLoginStatus() async {
@@ -34,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
       {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const WatchwearosHomescreen()),
+          MaterialPageRoute(builder: (context) => const Authorize()),
         );
         // if (isWearOsLoggedIn && (currentTime - loginTimestamp) < sixtyMinutes) {
         //   Navigator.pushReplacement(
@@ -70,10 +76,12 @@ class _SplashScreenState extends State<SplashScreen> {
             MaterialPageRoute(builder: (context) => const LoginScreen()),
           );
         }
+
     }
 
 
   }
+
 
   @override
   Widget build(BuildContext context) {

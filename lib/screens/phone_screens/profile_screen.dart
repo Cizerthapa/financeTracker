@@ -3,6 +3,7 @@ import 'package:finance_track/screens/phone_screens/settings_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/profile_provider.dart';
 import 'login_screen.dart';
@@ -162,7 +163,9 @@ class ProfilePage extends StatelessWidget {
                 iconColor: Colors.red,
                 textColor: Colors.red,
                 onTap: () async {
-                  await provider_log.logout();
+
+                  WatchConnectivity watchConnectivity = WatchConnectivity();
+                  await provider_log.logout(watchConnectivity);
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginScreen()),

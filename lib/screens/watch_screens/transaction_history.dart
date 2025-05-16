@@ -2,6 +2,9 @@ import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
+
+import '../../providers/login_provider.dart';
 
 class TransactionHistory extends StatefulWidget {
   const TransactionHistory({super.key});
@@ -19,14 +22,24 @@ class _TransactionHistoryState extends State<TransactionHistory> {
       Navigator.of(context).pop();
     }
   }
-
+  late WatchConnectivity watchConnectivity;
   @override
   void initState() {
     super.initState();
-
+    watchConnectivity = WatchConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+    });
     Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase();
   }
 
+  @override
+  void didChangeDependencies() async
+  {
+    super.didChangeDependencies();
+    watchConnectivity = WatchConnectivity();
+    Provider.of<LoginProvider>(context).wearOsLogout(watchConnectivity, context);
+  }
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);

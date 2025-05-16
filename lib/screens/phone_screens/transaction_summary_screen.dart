@@ -84,6 +84,7 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.calendar_month, size: 20, color: Colors.white),
+
               const SizedBox(width: 8),
               Text(
                 formattedMonthYear,

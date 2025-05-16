@@ -30,7 +30,42 @@ class _LoginScreenState extends State<LoginScreen>
   void initState() {
     super.initState();
     _watchConnectivity = WatchConnectivity();
+
+    _watchConnectivity.messageStream.listen((message){
+
+      if(message["UserSession"])
+        {
+          isLogggedIn();
+
+        }
+      else
+        {
+          print("false login");
+        }
+    });
+
   }
+
+
+  void isLogggedIn() async {
+    if (await _watchConnectivity.isReachable) {
+      try {
+
+        await _watchConnectivity.sendMessage({
+          "auth_message": "Not Login",
+        });
+        print("Message sent to Mobile OS");
+      } catch (e) {
+        print("Failed to send message: $e");
+
+      }
+    } else {
+      print("Mobile OS device is not reachable");
+
+    }
+
+  }
+
 
   @override
   void dispose() {
@@ -40,7 +75,8 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _signIn() async {
-    setState(() {
+    setState(()
+    {
       _isLoggingIn = true;
     });
 
@@ -49,12 +85,13 @@ class _LoginScreenState extends State<LoginScreen>
 
     final user = await _auth.signInWithEmailAndPassword(email, password);
 
-    setState(() {
+    setState(()
+    {
       _isLoggingIn = false;
     });
 
-    if (user != null) {
-
+    if (user != null)
+    {
       final loginProvider = Provider.of<LoginProvider>(context, listen: false);
       loginProvider.login(email, password, _watchConnectivity);
 
@@ -66,8 +103,6 @@ class _LoginScreenState extends State<LoginScreen>
         context,
         MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
       );
-
-
     }
     else
     {

@@ -1,7 +1,10 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 
+import '../../providers/login_provider.dart';
 import 'add_new_budget.dart';
 
 class SpendingAlerts extends StatefulWidget {
@@ -11,7 +14,9 @@ class SpendingAlerts extends StatefulWidget {
   State<SpendingAlerts> createState() => _SpendingAlertsState();
 }
 
-class _SpendingAlertsState extends State<SpendingAlerts> {
+class _SpendingAlertsState extends State<SpendingAlerts>
+{
+
   void handleSwipe(BuildContext context, DragUpdateDetails details)
   {
     double dx = details.delta.dx;
@@ -20,10 +25,24 @@ class _SpendingAlertsState extends State<SpendingAlerts> {
       Navigator.of(context).pop();
     }
     else if(dx < -10)
-      {
+    {
         Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBudget()));
-      }
+    }
   }
+
+  late WatchConnectivity watchConnectivity;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    watchConnectivity = WatchConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+    });
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

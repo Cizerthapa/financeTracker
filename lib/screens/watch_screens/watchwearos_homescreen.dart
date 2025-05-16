@@ -4,7 +4,10 @@ import 'package:finance_track/screens/watch_screens/transaction_history.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
+import '../../providers/login_provider.dart';
 import '../../providers/transaction_provider.dart';
+import 'authorize.dart';
 import 'budget_summary.dart';
 import 'expense_entry.dart';
 
@@ -38,13 +41,20 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
     }
   }
 
-
+  late WatchConnectivity watchConnectivity;
 
   @override
   void initState() {
     super.initState();
     Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase();
+    watchConnectivity = WatchConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+    });
+
+
   }
+
 
   @override
   Widget build(BuildContext context) {
