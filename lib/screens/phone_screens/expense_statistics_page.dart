@@ -1,4 +1,5 @@
 import 'package:finance_track/components/widgets/flowchart_widget.dart';
+import 'package:finance_track/screens/phone_screens/category_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +46,36 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
     }
   }
 
+  Future<bool> _confirmDelete(BuildContext context, String category) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Confirm Delete'),
+            content: Text('Are you sure you want to delete "$category"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (shouldDelete == true) {
+      await context.read<ExpenseStatisticsProvider>().deleteBudget(category);
+      return true;
+    }
+    return false;
+  }
+
   String get formattedMonthYear {
     return DateFormat('MMMM, yyyy').format(selectedDate);
   }
@@ -52,21 +83,7 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<ExpenseStatisticsProvider>(context);
-    final categories = [
-      {'title': 'Food', 'spent': 3200.0, 'budget': 4000.0, 'percentage': 80.0},
-      {
-        'title': 'Transport',
-        'spent': 1500.0,
-        'budget': 3000.0,
-        'percentage': 50.0,
-      },
-      {
-        'title': 'Shopping',
-        'spent': 800.0,
-        'budget': 2000.0,
-        'percentage': 40.0,
-      },
-    ];
+    final categories = statsProvider.categoryStats;
 
     return Scaffold(
       backgroundColor: const Color(0xff0077A3),
@@ -144,44 +161,73 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
                     horizontal: 16.w,
                     vertical: 8.h,
                   ),
-                  child: Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
+                  child: Dismissible(
+                    key: Key(title), // Make sure this is unique
+                    direction: DismissDirection.endToStart,
+                    confirmDismiss: (direction) async {
+                      return await _confirmDelete(context, title);
+                    },
+                    background: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => CategoryDetailScreen(
+                                  title: title,
+                                  spent: spent,
+                                  budget: budget,
+                                  percentage: percentage,
+                                ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              title,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14.sp,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                                Text(
+                                  '${percentage.toStringAsFixed(0)}%',
+                                  style: TextStyle(fontSize: 12.sp),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '${percentage.toStringAsFixed(0)}%',
-                              style: TextStyle(fontSize: 12.sp),
+                            SizedBox(height: 8.h),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.r),
+                              child: LinearProgressIndicator(
+                                value: percentage / 100,
+                                backgroundColor: Colors.grey.shade300,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Color(0xff0b2e38),
+                                ),
+                                minHeight: 8.h,
+                              ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.h),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10.r),
-                          child: LinearProgressIndicator(
-                            value: percentage / 100,
-                            backgroundColor: Colors.grey.shade300,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xff0b2e38),
-                            ),
-                            minHeight: 8.h,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 );

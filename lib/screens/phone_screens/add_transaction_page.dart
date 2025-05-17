@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finance_track/providers/expense_statistics_provider.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -74,6 +75,15 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         context,
         listen: false,
       ).addTransaction(newTx);
+      // Update budget only if it's an expense
+      if (_selectedType == 'Expense') {
+        await context.read<ExpenseStatisticsProvider>().addOrUpdateBudget(
+          _titleController.text.trim(), // category
+          double.parse(_amountController.text), // amount
+          DateTime.now(),
+          DateTime.now().add(const Duration(days: 30)),
+        );
+      }
 
       ScaffoldMessenger.of(
         context,
