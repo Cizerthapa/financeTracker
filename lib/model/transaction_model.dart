@@ -3,7 +3,8 @@ class TransactionModel {
   final double amount;
   final String date;
   final String method;
-  final String? type; // <-- This must be present
+  final String? type;
+  final String? category;
 
   TransactionModel({
     required this.title,
@@ -11,6 +12,7 @@ class TransactionModel {
     required this.date,
     required this.method,
     this.type,
+    this.category,
   });
 
   factory TransactionModel.fromMap(Map<String, dynamic> data) {
@@ -19,7 +21,8 @@ class TransactionModel {
       amount: (data['amount'] as num).toDouble(),
       date: data['date'] ?? '',
       method: data['method'] ?? '',
-      type: data['type'] ?? '', // Add this line
+      type: data['type'] ?? '',
+      category: data['category'] ?? '', // <-- map from Firestore
     );
   }
 
@@ -29,7 +32,8 @@ class TransactionModel {
       'amount': amount,
       'date': date,
       'method': method,
-      'title': title,
+      'type': type,
+      'category': category, // <-- include in upload
     };
   }
 }

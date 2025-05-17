@@ -1,3 +1,4 @@
+import 'package:finance_track/components/widgets/balance_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -56,6 +57,10 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
+
+    final balance = provider.balance;
+    final income = provider.totalIncome;
+    final expenses = provider.totalExpenses;
 
     final filteredTransactions =
         provider.transactions.where((tx) {
@@ -153,11 +158,12 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
                         ),
                         SummaryItem(
                           label: 'Total',
-                          amount: '₨${provider.totalAmount.toStringAsFixed(2)}',
+                          amount: '₨${provider.balance.toStringAsFixed(2)}',
                         ),
                       ],
                     ),
                   ),
+                  BalanceCard(balance: balance),
                   Expanded(
                     child:
                         groupedTx.isEmpty

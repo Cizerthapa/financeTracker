@@ -26,7 +26,7 @@ class TransactionProvider with ChangeNotifier {
       .where((t) => t.type?.toLowerCase() == 'income')
       .fold(0.0, (sum, t) => sum + t.amount);
 
-  double get totalAmount => totalIncome - totalExpenses;
+  double get balance => totalIncome - totalExpenses;
 
   Map<String, List<TransactionModel>> get groupedTransactions {
     final Map<String, List<TransactionModel>> map = {};
@@ -41,8 +41,7 @@ class TransactionProvider with ChangeNotifier {
     final uid = prefs.getString('userUID');
     print(uid! + "<-- THis is from");
 
-    if (uid == null)
-    {
+    if (uid == null) {
       return;
     }
 

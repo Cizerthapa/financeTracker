@@ -1,5 +1,6 @@
 import 'package:finance_track/providers/expense_statistics_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class AddBudgetPage extends StatefulWidget {
@@ -16,6 +17,15 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
 
   DateTime? _startDate;
   DateTime? _endDate;
+
+  final List<String> _categories = [
+    'Food',
+    'Transport',
+    'Shopping',
+    'Bills',
+    'Other',
+  ];
+  String _selectedCategory = 'Food';
 
   void _pickDate({required bool isStart}) async {
     final now = DateTime.now();
@@ -45,7 +55,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
         context,
         listen: false,
       ).addBudget(
-        _categoryController.text.trim(),
+        _selectedCategory,
         double.parse(_amountController.text.trim()),
         _startDate!,
         _endDate!,
@@ -58,33 +68,48 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add New Budget')),
+      appBar: AppBar(
+        title: Text('Add New Budget', style: TextStyle(fontSize: 18.sp)),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                controller: _categoryController,
-                decoration: const InputDecoration(labelText: 'Category'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Enter a category'
-                            : null,
-              ),
+              SizedBox(height: 12.h),
               TextFormField(
                 controller: _amountController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Amount Limit'),
+                decoration: InputDecoration(
+                  labelText: 'Amount Limit',
+                  labelStyle: TextStyle(fontSize: 14.sp),
+                ),
+                style: TextStyle(fontSize: 14.sp),
                 validator:
                     (value) =>
                         value == null || double.tryParse(value) == null
                             ? 'Enter a valid amount'
                             : null,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                items:
+                    _categories
+                        .map(
+                          (cat) =>
+                              DropdownMenuItem(value: cat, child: Text(cat)),
+                        )
+                        .toList(),
+                onChanged: (val) {
+                  setState(() {
+                    _selectedCategory = val!;
+                  });
+                },
+                decoration: const InputDecoration(labelText: 'Category'),
+              ),
+              SizedBox(height: 12.h),
               Row(
                 children: [
                   Expanded(
@@ -92,28 +117,33 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                       onPressed: () => _pickDate(isStart: true),
                       child: Text(
                         _startDate == null
-                            ? 'Select Start Date'
+                            ? 'Start Date'
                             : _startDate!.toLocal().toString().split(' ')[0],
+                        style: TextStyle(fontSize: 13.sp),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.w),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => _pickDate(isStart: false),
                       child: Text(
                         _endDate == null
-                            ? 'Select End Date'
+                            ? 'End Date'
                             : _endDate!.toLocal().toString().split(' ')[0],
+                        style: TextStyle(fontSize: 13.sp),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _saveBudget,
-                child: const Text('Save Budget'),
+              SizedBox(height: 24.h),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saveBudget,
+                  child: Text('Save Budget', style: TextStyle(fontSize: 14.sp)),
+                ),
               ),
             ],
           ),
