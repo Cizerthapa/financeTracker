@@ -1,3 +1,4 @@
+import 'package:finance_track/components/widgets/balance_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -67,6 +68,11 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
         return false;
       }
     }).toList();
+
+    final balance = provider.balance;
+    final income = provider.totalIncome;
+    final expenses = provider.totalExpenses;
+
 
     final groupedTx = <String, List<TransactionModel>>{};
     for (var tx in filteredTransactions) {
@@ -211,6 +217,18 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
                                     ),
                                   ),
                                 ],
+                  ),
+                  BalanceCard(balance: balance),
+                  Expanded(
+                    child:
+                        groupedTx.isEmpty
+                            ? const Center(
+                              child: Text(
+                                'Nothing to show',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
                               Row(
                                 children: [

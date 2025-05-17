@@ -41,6 +41,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       });
     }
   }
+
   late WatchConnectivity _watchConnectivity = WatchConnectivity();
   Future<void> _saveTransaction() async {
     if (!_formKey.currentState!.validate()) return;
@@ -79,7 +80,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       ).showSnackBar(const SnackBar(content: Text('Transaction saved!')));
 
       //For Watch Notification
-      sendNotification("New " +_titleController.text.trim() + " " + _selectedType + " is Added!");
+      sendNotification(
+        "New " +
+            _titleController.text.trim() +
+            " " +
+            _selectedType +
+            " is Added!",
+      );
       //
 
       Navigator.pop(context);
@@ -93,30 +100,19 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     setState(() => _isSaving = false);
   }
 
-
-
-  void sendNotification(var name) async {
-    if (await _watchConnectivity.isReachable)
-    {
-      try {
-        await _watchConnectivity.sendMessage({
-          "notification": name,
-        });
-        print("Message sent to Mobile O");
+  void sendNotification(String name) async {
+    try {
+      if (await _watchConnectivity.isSupported &&
+          await _watchConnectivity.isReachable) {
+        await _watchConnectivity.sendMessage({"notification": name});
+        print("Message sent to wearable");
+      } else {
+        print("Wearable not supported or not reachable");
       }
-      catch (e)
-      {
-        print("Failed to send message: $e");
-
-      }
-    }
-    else
-    {
-      print("Mobile OS device is not reachable");
-
+    } catch (e) {
+      print("Failed to send message: $e");
     }
   }
-
 
   @override
   void initState() {

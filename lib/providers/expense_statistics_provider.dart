@@ -30,10 +30,11 @@ class ExpenseStatisticsProvider with ChangeNotifier {
         throw Exception('User not logged in');
       }
 
-      final snapshot = await _firestore
-          .collection('budgets')
-          .where('uid', isEqualTo: userUid)
-          .get();
+      final snapshot =
+          await _firestore
+              .collection('budgets')
+              .where('uid', isEqualTo: userUid)
+              .get();
 
       double totalBudgetSet = snapshot.docs.fold(0.0, (sum, doc) {
         return sum + doc['amountLimit'];
@@ -42,7 +43,12 @@ class ExpenseStatisticsProvider with ChangeNotifier {
       log('Total budget set: $totalBudgetSet');
       return totalBudgetSet;
     } catch (e, stack) {
-      log('Failed to get total budget set', error: e, stackTrace: stack, level: 1000);
+      log(
+        'Failed to get total budget set',
+        error: e,
+        stackTrace: stack,
+        level: 1000,
+      );
       throw Exception('Failed to get total budget set: $e');
     }
   }
@@ -56,10 +62,11 @@ class ExpenseStatisticsProvider with ChangeNotifier {
         throw Exception('User not logged in');
       }
 
-      final snapshot = await _firestore
-          .collection('budgets')
-          .where('uid', isEqualTo: userUid)
-          .get();
+      final snapshot =
+          await _firestore
+              .collection('budgets')
+              .where('uid', isEqualTo: userUid)
+              .get();
 
       double totalBudget = 0.0;
       for (var doc in snapshot.docs) {
@@ -69,7 +76,12 @@ class ExpenseStatisticsProvider with ChangeNotifier {
       log('Computed totalBudgetSet: $totalBudget');
       return totalBudget;
     } catch (e, stack) {
-      log('Failed to fetch total budget', error: e, stackTrace: stack, level: 1000);
+      log(
+        'Failed to fetch total budget',
+        error: e,
+        stackTrace: stack,
+        level: 1000,
+      );
       throw Exception('Failed to fetch total budget: $e');
     }
   }
@@ -120,7 +132,12 @@ class ExpenseStatisticsProvider with ChangeNotifier {
   //   }
   // }
 
-  Future<void> addBudget(String category, double amountLimit, DateTime startDate, DateTime endDate) async {
+  Future<void> addBudget(
+    String category,
+    double amountLimit,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userUid = prefs.getString('userUID');
@@ -140,10 +157,7 @@ class ExpenseStatisticsProvider with ChangeNotifier {
       };
 
       await docRef.set(newBudget);
-      _categories.add({
-        'title': category,
-        'amount': amountLimit,
-      });
+      _categories.add({'title': category, 'amount': amountLimit});
 
       log('Added new budget: $newBudget');
       notifyListeners();
@@ -164,10 +178,11 @@ class ExpenseStatisticsProvider with ChangeNotifier {
 
       log('Fetching budgets for user: $userUid');
 
-      final snapshot = await _firestore
-          .collection('budgets')
-          .where('uid', isEqualTo: userUid)
-          .get();
+      final snapshot =
+          await _firestore
+              .collection('budgets')
+              .where('uid', isEqualTo: userUid)
+              .get();
 
       List<Map<String, dynamic>> fetchedCategories = [];
       for (var doc in snapshot.docs) {
