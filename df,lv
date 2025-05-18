@@ -1,0 +1,254 @@
+[33mcommit 77bd45408fe331922f9d42b626a18b041215e657[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mFeat/Watch_Backend[m[33m)[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Sun May 18 16:18:21 2025 +0545
+
+    Pulling
+
+[33mcommit a6849a959ff216a79a66a194aa3c74ba52964279[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Sun May 18 16:12:06 2025 +0545
+
+    Pulling
+
+[33mcommit 63e0040e51fad05a3bf68a74a8f31b07ded06389[m[33m ([m[1;31morigin/Feat/Watch_Backend[m[33m)[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Fri May 16 17:19:01 2025 +0545
+
+    Watchwear os backend done
+
+[33mcommit 5da620cc010e88775dd4dc0bc6b5a212a1556968[m[33m ([m[1;31morigin/Feat/WatchAuthentication[m[33m, [m[1;32mFeat/WatchAuthentication[m[33m)[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Fri May 16 12:47:53 2025 +0545
+
+    Feat/Watch Login and Logout
+
+[33mcommit fde03241bafbdbd98b1c27cc89224e233b05733b[m[33m ([m[1;32mFeat/WatchFrontend[m[33m)[m
+Merge: ab5e0f4 757d483
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Wed May 14 21:25:19 2025 +0545
+
+    Merge pull request #13 from Cizerthapa/Feat/splash-screen
+    
+    feat : added the splash screen and logo for the app launch
+
+[33mcommit 757d48326549222a19362789881fa340d44b0c37[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Wed May 14 21:13:06 2025 +0545
+
+    feat(ui) : added the splash screen for the app launch
+
+[33mcommit ab5e0f41b613b721ec0921e8705990ab7f573eac[m[33m ([m[1;31murl/Feat/WatchFrontend[m[33m, [m[1;31morigin/Feat/WatchFrontend[m[33m)[m
+Merge: 58271f0 2180ba9
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Sat May 10 19:13:32 2025 +0545
+
+    Merge pull request #11 from Cizerthapa/feature/user-based-transactions-nepali-currency
+    
+    feat: Implement user-based transactions and Nepali currency format
+
+[33mcommit 2180ba9dd99901aa8640e82cdbe890658ceb8726[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Thu May 8 21:10:23 2025 +0545
+
+    feat: Implement user-based transactions and Nepali currency format
+
+[33mcommit 58271f0f4a6402aa25020f1efcaa535e32c97d12[m
+Merge: a91c8eb fd085d7
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Thu May 8 11:35:45 2025 +0545
+
+    Merge pull request #10 from Cizerthapa/Feat/WatchFrontend
+    
+    Feat/watch frontend
+
+[33mcommit fd085d7300a9a240daf0e8c8891ccc77435b5c8b[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Mon May 5 10:22:28 2025 +0545
+
+    Title, swipe, updated and repeated watchwear file deleted
+
+[33mcommit 1a257f56ecf88f417cbcce947633aec9ce921465[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Mon May 5 10:16:25 2025 +0545
+
+    Some Features updated
+
+[33mcommit b07919b2f814acd82faa312db8bb9f31ba5904ad[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Sun May 4 12:12:40 2025 +0545
+
+    feat/completed the transaction view with add, filter and view by date
+
+[33mcommit 3c90cabaf81ca9338fed82bb44d30cc6f0cc1c02[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Sun May 4 11:22:40 2025 +0545
+
+    refactor/made some changes to the file struc to follow snakecase
+
+[33mcommit a91c8ebd24e5d6c94166e7515db70b9b2ac2fc45[m
+Merge: 761c56e 508ab36
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Sat May 3 13:46:06 2025 +0545
+
+    Merge pull request #9 from Cizerthapa/Feat/WatchFrontend
+    
+    Feat/watch frontend
+
+[33mcommit 508ab36278b9753a198f8344042f90f142da03ce[m
+Merge: 29c0af8 761c56e
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Sat May 3 13:45:52 2025 +0545
+
+    Merge branch 'development' into Feat/WatchFrontend
+
+[33mcommit 29c0af8f019a3bf3075b05c836905016429e3d9d[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Sat May 3 13:28:21 2025 +0545
+
+    refactor/folderstructure maintain
+
+[33mcommit 35d236b6d615984b632f23e67f46573f16a5c071[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Sat May 3 13:08:20 2025 +0545
+
+    feat/added income dynamic and minor changes in Ui
+
+[33mcommit 27d21f170ba2fc7ce06497e2bde880e8dfad284b[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Fri May 2 15:02:35 2025 +0545
+
+    Fronend completed of watch wear os
+
+[33mcommit 761c56e4222d482b82edd7d6c6bf8da3086da7ab[m
+Merge: 7dc2de5 403330c
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Sat Apr 26 21:18:43 2025 +0545
+
+    Merge pull request #7 from Cizerthapa/Feat/WatchHome
+    
+    Features/Watchhome Screen  Added
+
+[33mcommit 9fdde640d065202bd6a251f4a03dbe499bffc667[m[33m ([m[1;32mFeat/WatchHome[m[33m)[m
+Merge: 403330c 7dc2de5
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Sat Apr 26 21:05:03 2025 +0545
+
+    Merge branch 'development' of https://github.com/Cizerthapa/financeTracker into Feat/WatchHome
+
+[33mcommit 403330cae926fed2bb53f20b99b05748b1e84b0c[m[33m ([m[1;31morigin/Feat/WatchHome[m[33m)[m
+Author: RezoneMajhakoti-protocol <apps60765@gmail.com>
+Date:   Sat Apr 26 20:55:13 2025 +0545
+
+    Features/Watchhome Screen  Added
+
+[33mcommit 7dc2de5dc1dce024f84e9ef991237bbe98289a1a[m
+Merge: 6a03317 52fa24a
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Sat Apr 26 20:33:46 2025 +0545
+
+    Merge pull request #6 from Cizerthapa/Feat/DynamicProfile
+    
+    Feat/dynamic profile
+
+[33mcommit 52fa24a3d7d2825d0ab8116b446b15a366f2a783[m
+Merge: 7fcb953 6a03317
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Sat Apr 26 20:24:02 2025 +0545
+
+    Merge branch 'development' of https://github.com/Cizerthapa/financeTracker into Feat/DynamicProfile
+
+[33mcommit 6a033179fe5243cf792a49f578d6c6b1014b2ed7[m
+Merge: 8fdce54 35ab029
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Sat Apr 26 20:16:34 2025 +0545
+
+    Merge pull request #5 from Cizerthapa/Feat/NavBScreens
+    
+    Feat/nav b screens
+
+[33mcommit 7fcb9538e1e06dc21d8aef87845226a2201ca986[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Sat Apr 26 20:12:54 2025 +0545
+
+    Features/Dynamic Profile with Updated in User Database
+
+[33mcommit 35ab029f0b9ecdbbb5279ebcd74aaaa67b98399d[m[33m ([m[1;31murl/Feat/NavBScreens[m[33m, [m[1;32mFeat/NavBScreens[m[33m)[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Fri Apr 25 16:43:18 2025 +0545
+
+    Feat/added transaction from firestore
+
+[33mcommit 2d88508acd5ce0207852fa2a29be43d9fe4b8ac4[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Fri Apr 25 16:17:39 2025 +0545
+
+    Refactor/added the proper provider logic
+
+[33mcommit 5056d9d10e948e4d9f7a7dddf283aa775d199d7f[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Fri Apr 25 15:55:56 2025 +0545
+
+    Feat/added all the buttom nav pages
+
+[33mcommit 0c886b22d764617e1b54cffcdeab82ef6c832aeb[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Sat Apr 19 20:07:18 2025 +0545
+
+    fix/error has been solved
+
+[33mcommit 13a3e3d866fda43c1b78321e7d44c5ebe569f27e[m
+Author: Cizerthapa <cizerthapa@gmail.com>
+Date:   Sat Apr 19 15:45:54 2025 +0545
+
+    error/firebase
+
+[33mcommit 8fdce5443f6853f3a579480c5a859cc645c5b1fa[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Sat Apr 19 13:34:27 2025 +0545
+
+    feature/splash screen
+
+[33mcommit 179b2837565e3f7577b5c72e0e575e704a910203[m
+Merge: d9342bf bb8b9e0
+Author: Cizer Thapa <109401437+Cizerthapa@users.noreply.github.com>
+Date:   Sat Apr 19 13:13:27 2025 +0545
+
+    Merge pull request #2 from Cizerthapa/Authentication
+    
+    Authentication
+
+[33mcommit bb8b9e080229daf911941e4cd43df9a10d32cfeb[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Thu Apr 17 14:40:12 2025 +0545
+
+    feature/In login Shared preference is used for 60 minutes
+
+[33mcommit 1668f813ab9a63dd46bfda78b3875b8e2db4390c[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Mon Apr 14 20:37:36 2025 +0545
+
+    feature/Login Auth
+
+[33mcommit 7f82f42d942e0cd7c9964ef745ba16f3c5b4a816[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Sun Apr 13 22:42:14 2025 +0545
+
+    feature/Register User Authentication
+
+[33mcommit 0255c80102b68ab77f0b3e4036ff49582836522b[m
+Author: Abhinav Shrestha <abhinavshr002@gmail.com>
+Date:   Sun Apr 13 19:45:12 2025 +0545
+
+    Feature/Login and Register
+
+[33mcommit d9342bf677cd9276bc8f41586ea2a130cd77ac48[m
+Author: cizerthapa12345 <np01ma4a220015@islingtoncollege.edu.np>
+Date:   Sat Mar 29 21:05:38 2025 +0545
+
+    Initial Setup
+
+[33mcommit d2132a250929a2cfbfde3c47388dc579278f0b1a[m
+Author: cizerthapa12345 <np01ma4a220015@islingtoncollege.edu.np>
+Date:   Sat Mar 29 21:05:11 2025 +0545
+
+    first commit
