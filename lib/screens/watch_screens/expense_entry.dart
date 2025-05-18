@@ -1,29 +1,43 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finance_track/screens/watch_screens/addtransaction_or_spendingalerts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/login_provider.dart';
-import 'calculator.dart';
+
+import '../../providers/transaction_provider.dart';
 import 'categories.dart';
 
 class ExpenseEntry extends StatefulWidget {
-  const ExpenseEntry({super.key});
+  final String cateogries;
+
+  const ExpenseEntry({super.key, required this.cateogries});
 
   @override
   State<ExpenseEntry> createState() => _ExpenseEntryState();
 }
 
 class _ExpenseEntryState extends State<ExpenseEntry> {
+
+
+
   void handleSwipe(BuildContext context, DragUpdateDetails details)
   {
     double dx = details.delta.dx;
     if (dx < -10)
     {
-      Navigator.of(context).pop();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddtransactionOrSpendingalerts()));
     }
   }
+
+  bool isIncome = false;
+  bool isExpenses = true;
+
   late WatchConnectivity watchConnectivity;
   @override
   void initState() {
@@ -35,6 +49,72 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
     });
 
   }
+
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _closeKeyboard() {
+
+    _focusNode.unfocus();
+  }
+
+  bool _isSaving = false;
+
+  Future<void> _saveTransaction() async {
+
+    setState(() => _isSaving = true);
+
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('userUID');
+
+    if (uid == null) {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in.')),
+      );
+      return;
+    }
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('d MMMM, y').format(now);
+
+    final newTx = {
+      'amount': double.parse(_controller.text),
+      'title': widget.cateogries,
+      'method': "Cash",
+      'type': isIncome ? "Income" : "Expenses",
+      'date': formattedDate,
+      'uid': uid,
+      'timestamp': Timestamp.now(),
+    };
+
+    try {
+      await Provider.of<TransactionProvider>(context, listen: false)
+          .addTransaction(newTx);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Transaction saved!')),
+      );
+
+
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddtransactionOrSpendingalerts()));
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save transaction.')),
+      );
+    }
+
+    setState(() => _isSaving = false);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +158,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                           Icon(Icons.tag_rounded, size: 16, color: Colors.black87),
             
                           Text(
-                            'Categories',
+                            widget.cateogries.isEmpty ? "Title" : widget.cateogries,
                             style: TextStyle(fontSize: 12, color: Colors.black87),
                           ),
                         ],
@@ -98,12 +178,15 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                               ),
                             ),
                             onPressed: () {
-                              print('Button Pressed');
+                            setState(() {
+                              isIncome = true;
+                              isExpenses = false;
+                            });
                             },
                             child: Row(
                               mainAxisSize: MainAxisSize.min, // Adjust size based on content
                               children: [
-                                Icon(Icons.check_box_outline_blank, size: 14, color: Colors.black87),
+                                Icon(isIncome ? Icons.check_box : Icons.check_box_outline_blank, size: 14, color: Colors.black87),
                                 SizedBox(width: 4),
                                 Text(
                                   'Income',
@@ -123,12 +206,15 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                               ),
                             ),
                             onPressed: () {
-                              print('Button Pressed');
+                             setState(() {
+                               isIncome = false;
+                               isExpenses = true;
+                             });
                             },
                             child: Row(
                               mainAxisSize: MainAxisSize.min, // Adjust size based on content
                               children: [
-                                Icon(Icons.check_box_outline_blank, size: 14, color: Colors.black87),
+                                Icon(isExpenses ? Icons.check_box : Icons.check_box_outline_blank, size: 14, color: Colors.black87),
                                 SizedBox(width: 4),
                                 Text(
                                   'Expenses',
@@ -142,47 +228,41 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Center(
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.black12,
+                      ),
                       child: Row(
-                        children:
-                        [
-                          Container(
-            
-                            decoration: BoxDecoration(
-                              color: Colors.white, // Set background color here
-                              borderRadius: BorderRadius.circular(5),  // Set the border radius here
-                            ),
-                            child: SizedBox(
-                              width: 155,
-                              height: 35,
-            
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.attach_money_outlined, size: 16, color: Colors.black87),
-                                  SizedBox(width: 1),
-                                  Text(
-                                    "0",
-                                  )
-            
-                                ],
+                        children: [
+                          // Number TextField
+                          Expanded(
+                            child: TextField(
+                              controller: _controller,
+                              focusNode: _focusNode,
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(fontSize: 14, color: Colors.white),
+                              decoration: const InputDecoration(
+                                hintText: 'Enter number',
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
                           ),
-            
-                          SizedBox(width: 3,),
-            
-                          InkWell
-                            (
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => Calculator()));
-                            },
-                              child: Icon(Icons.calculate_sharp, size: 28,)),
-            
-            
+                          // X Button
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white),
+                            onPressed: _closeKeyboard,
+                            iconSize: 20,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
                         ],
                       ),
                     ),
+
                     SizedBox(height: 5),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -192,8 +272,12 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                       ),
-                      onPressed: () {
-                        print('Button Pressed');
+                      onPressed: ()
+                      {
+
+
+                        _saveTransaction();
+
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min, // Adjust size based on content

@@ -1,7 +1,9 @@
 
 import 'package:finance_track/providers/notification_provider.dart';
+import 'package:finance_track/screens/watch_screens/addtransaction_or_spendingalerts.dart';
 import 'package:finance_track/screens/watch_screens/spending_alerts.dart';
 import 'package:finance_track/screens/watch_screens/transaction_history.dart';
+import 'package:finance_track/screens/watch_screens/transaction_or_budget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,20 +28,20 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
 
     if (dx > 10)
     {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ExpenseEntry()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddtransactionOrSpendingalerts()));
     }
     else if (dx < -10)
     {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => BudgetSummary()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionOrBudget()));
     }
-    else if (dy > 10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionHistory()));
-    }
-    else if (dy < -10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => SpendingAlerts()));
-    }
+    // else if (dy > 10)
+    // {
+    //   Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionHistory()));
+    // }
+    // else if (dy < -10)
+    // {
+    //   Navigator.push(context, MaterialPageRoute(builder: (context) => SpendingAlerts()));
+    // }
   }
 
   late WatchConnectivity watchConnectivity;
@@ -70,15 +72,15 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
 
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-
-    final notification = context.watch<NotificationProvider>().notification;
-
-    print("Notification: $notification");
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //
+  //
+  //   final notification = context.watch<NotificationProvider>().notification;
+  //
+  //   print("Notification: $notification");
+  // }
 
     @override
   Widget build(BuildContext context) {
@@ -120,9 +122,9 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                             ),
                           ),
                           Text(
-                            'Rs. 0.0',
+                            "₨. ${provider.totalIncome.toStringAsFixed(2)}",
                             style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold
                             ),
                           ),
@@ -174,7 +176,7 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                                           color: item.type != 'Income' ? Colors.red : Colors.green,
                                         ),
                                         Text(
-                                          '\$${item.amount.abs().toStringAsFixed(2)}',
+                                          'Rs. ${item.amount.abs().toStringAsFixed(2)}',
                                           style: TextStyle(
                                             fontSize: 10,
                                             color: item.type != 'Income' ? Colors.red : Colors.green,
@@ -233,9 +235,9 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                           ),
                         ),
                         Text(
-                          'Rs. 0.0',
+                          "₨. ${provider.totalExpenses.toStringAsFixed(2)}",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/login_provider.dart';
-import 'add_new_budget.dart';
+
+import 'addtransaction_or_spendingalerts.dart';
 
 class SpendingAlerts extends StatefulWidget {
   const SpendingAlerts({super.key});
@@ -20,13 +21,9 @@ class _SpendingAlertsState extends State<SpendingAlerts>
   void handleSwipe(BuildContext context, DragUpdateDetails details)
   {
     double dx = details.delta.dx;
-    if (dx > 10)
+  if(dx < -10)
     {
-      Navigator.of(context).pop();
-    }
-    else if(dx < -10)
-    {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBudget()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddtransactionOrSpendingalerts()));
     }
   }
 
