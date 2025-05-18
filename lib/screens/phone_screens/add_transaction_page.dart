@@ -28,10 +28,16 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   final List<String> _methods = ['Cash', 'Card', 'eWallet'];
   final List<String> _types = ['Income', 'Expense'];
 
-  final List<String> _categories = ['Food', 'Transport', 'Shopping', 'Bills', 'Other'];
+  final List<String> _categories = [
+    'Food',
+    'Transport',
+    'Shopping',
+    'Bills',
+    'Other',
+  ];
   String _selectedCategory = 'Food';
-  final TextEditingController _customCategoryController = TextEditingController();
-
+  final TextEditingController _customCategoryController =
+      TextEditingController();
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -61,24 +67,25 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     if (uid == null) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in.')));
       return;
     }
 
-    final String title = _selectedCategory == 'Other'
-        ? _customCategoryController.text.trim()
-        : _selectedCategory;
+    final String title =
+        _selectedCategory == 'Other'
+            ? _customCategoryController.text.trim()
+            : _selectedCategory;
 
     final newTx = {
       'amount': double.parse(_amountController.text),
       'title': title,
       'method': _selectedMethod,
-      'type': _selectedType,
+      'type': _selectedType.toLowerCase(),
       'date': _dateController.text.trim(),
       'uid': uid,
-      'timestamp': Timestamp.now(),
+      'timestamp': Timestamp.fromDate(_selectedDate),
     };
 
     try {
@@ -87,14 +94,12 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         listen: false,
       ).addTransaction(newTx);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Transaction saved!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Transaction saved!')));
 
       // For Watch Notification
-      sendNotification(
-        "New $title $_selectedType is Added!",
-      );
+      sendNotification("New $title $_selectedType is Added!");
 
       Navigator.pop(context);
     } catch (e) {
@@ -118,15 +123,16 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }
 
   Future<List<Map<String, dynamic>>> fetchUserBudgets(String uid) async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('budgets')
-        .where('uid', isEqualTo: uid)
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('budgets')
+            .where('uid', isEqualTo: uid)
+            .get();
 
     return snapshot.docs.map((doc) => doc.data()).toList();
   }
 
-  void updateBudgetSpent(){}
+  void updateBudgetSpent() {}
 
   void sendNotification(String name) async {
     try {
@@ -177,12 +183,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
-                items: _categories.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
-                  );
-                }).toList(),
+                items:
+                    _categories.map((category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
                 onChanged: (value) {
                   setState(() {
                     _selectedCategory = value!;
@@ -193,7 +200,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               if (_selectedCategory == 'Other')
                 TextFormField(
                   controller: _customCategoryController,
-                  decoration: const InputDecoration(labelText: 'Custom Category'),
+                  decoration: const InputDecoration(
+                    labelText: 'Custom Category',
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a category';
@@ -201,7 +210,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                     return null;
                   },
                 ),
-
 
               TextFormField(
                 controller: _dateController,

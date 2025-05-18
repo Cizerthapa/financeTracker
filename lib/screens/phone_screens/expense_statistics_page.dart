@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../providers/expense_statistics_provider.dart';
 import 'add_budget_page.dart';
+import 'dart:developer';
 
 class ExpenseStatisticsPage extends StatefulWidget {
   const ExpenseStatisticsPage({super.key});
@@ -19,8 +20,9 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
 
   @override
   void initState() {
-    context.read<ExpenseStatisticsProvider>().fetchBudgets();
     super.initState();
+    log('[initState] Calling fetchBudgets()');
+    context.read<ExpenseStatisticsProvider>().fetchBudgets();
   }
 
   Future<void> _pickMonthYear() async {
@@ -42,6 +44,7 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
     if (picked != null) {
       setState(() {
         selectedDate = picked;
+        log('[DatePicker] Selected month/year: ${picked.month}-${picked.year}');
       });
     }
   }
@@ -70,9 +73,11 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
     );
 
     if (shouldDelete == true) {
+      log('[Delete] Deleting category: $category');
       await context.read<ExpenseStatisticsProvider>().deleteBudget(category);
       return true;
     }
+
     return false;
   }
 
@@ -127,6 +132,10 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
               final progress =
                   totalBudgetSet > 0 ? totalSpend / totalBudgetSet : 0.0;
 
+              log(
+                '[UI] Total Budget: $totalBudgetSet | Total Spent: $totalSpend | Progress: ${progress * 100}%',
+              );
+
               return Padding(
                 padding: EdgeInsets.all(16.w),
                 child: Column(
@@ -155,6 +164,10 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
                 final spent = (category['spent'] as num?)?.toDouble() ?? 0.0;
                 final budget = (category['budget'] as num?)?.toDouble() ?? 0.0;
                 final percentage = budget > 0 ? (spent / budget) * 100 : 0.0;
+
+                log(
+                  '[UI] → $title | Spent: $spent | Budget: $budget | Percentage: ${percentage.toStringAsFixed(0)}%',
+                );
 
                 return Padding(
                   padding: EdgeInsets.symmetric(
@@ -219,8 +232,8 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
                               child: LinearProgressIndicator(
                                 value: percentage / 100,
                                 backgroundColor: Colors.grey.shade300,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xff0b2e38),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  spent > budget ? Colors.red : Colors.green,
                                 ),
                                 minHeight: 8.h,
                               ),
