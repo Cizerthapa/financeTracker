@@ -9,26 +9,22 @@ class ExpenseStatisticsProvider with ChangeNotifier {
   double totalIncome = 0;
   List<Map<String, dynamic>> _categories = [];
 
-  double get totalExpenses =>
-      _categories.fold(0.0, (sum, item) => sum + item['amount']);
+  double get totalExpenses => _categories.fold(
+    0.0,
+    (sum, item) => sum + ((item['amount'] ?? 0.0) as num).toDouble(),
+  );
 
   double get total => totalIncome - totalExpenses;
 
-  List<Map<String, dynamic>> get categoryStats {
-    return _categories.map((cat) {
-      double percentage = (cat['amount'] / totalExpenses) * 100;
-      return {'title': cat['title'], 'percentage': percentage};
-    }).toList();
-  }
+  List<Map<String, dynamic>> get categoryStats => _categories;
 
   Future<double> getTotalBudgetSet() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userUid = prefs.getString('userUID');
+      log('[getTotalBudgetSet] UID: $userUid');
 
-      if (userUid == null) {
-        throw Exception('User not logged in');
-      }
+      if (userUid == null) throw Exception('User not logged in');
 
       final snapshot =
           await _firestore
@@ -40,16 +36,47 @@ class ExpenseStatisticsProvider with ChangeNotifier {
         return sum + doc['amountLimit'];
       });
 
-      log('Total budget set: $totalBudgetSet');
+      log(
+        '[getTotalBudgetSet] Total: $totalBudgetSet for ${snapshot.docs.length} budgets',
+      );
       return totalBudgetSet;
     } catch (e, stack) {
-      log(
-        'Failed to get total budget set',
-        error: e,
-        stackTrace: stack,
-        level: 1000,
+      log('❌ [getTotalBudgetSet] Error', error: e, stackTrace: stack);
+      rethrow;
+    }
+  }
+
+  Future<void> deleteBudget(String category) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userUid = prefs.getString('userUID');
+      log('[deleteBudget] UID: $userUid | Category: $category');
+
+      if (userUid == null) throw Exception('User not logged in');
+
+      final snapshot =
+          await _firestore
+              .collection('budgets')
+              .where('uid', isEqualTo: userUid)
+              .get();
+
+      final docToDelete = snapshot.docs.firstWhere(
+        (doc) =>
+            (doc['category'] as String).toLowerCase() == category.toLowerCase(),
+        orElse: () => throw Exception('Category not found'),
       );
-      throw Exception('Failed to get total budget set: $e');
+
+      await docToDelete.reference.delete();
+      _categories.removeWhere(
+        (cat) =>
+            (cat['title'] as String).toLowerCase() == category.toLowerCase(),
+      );
+
+      log('✅ [deleteBudget] Deleted $category');
+      notifyListeners();
+    } catch (e, stack) {
+      log('❌ [deleteBudget] Error', error: e, stackTrace: stack);
+      rethrow;
     }
   }
 
@@ -86,51 +113,56 @@ class ExpenseStatisticsProvider with ChangeNotifier {
     }
   }
 
-  // Future<double> getTotalSpendForCategory(String category) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final userUid = prefs.getString('userUID');
-  //
-  //     if (userUid == null) {
-  //       throw Exception('User not logged in');
-  //     }
-  //
-  //     final budgetSnapshot = await _firestore
-  //         .collection('budgets')
-  //         .where('uid', isEqualTo: userUid)
-  //         .where('category', isEqualTo: category)
-  //         .get();
-  //
-  //     if (budgetSnapshot.docs.isEmpty) {
-  //       throw Exception('No budget found for category $category');
-  //     }
-  //
-  //     var budgetDoc = budgetSnapshot.docs.first;
-  //     DateTime startDate = budgetDoc['startDate'].toDate();
-  //     DateTime endDate = budgetDoc['endDate'].toDate();
-  //
-  //     log('Fetching expenses from $startDate to $endDate for category $category');
-  //
-  //     final snapshot = await _firestore
-  //         .collection('transactions')
-  //         .where('uid', isEqualTo: userUid)
-  //         .where('type', isEqualTo: 'expense')
-  //         .where('timestamp', isGreaterThanOrEqualTo: startDate)
-  //         .get();
-  //
-  //     double totalSpend = 0.0;
-  //     for (var doc in snapshot.docs) {
-  //       log('Expense found: ${doc.data()}');
-  //       totalSpend += doc['amount'];
-  //     }
-  //
-  //     log('Total spent in $category: $totalSpend');
-  //     return totalSpend;
-  //   } catch (e, stack) {
-  //     log('Error fetching total spend for $category', error: e, stackTrace: stack, level: 1000);
-  //     throw Exception('Failed to fetch total spend for category $category: $e');
-  //   }
-  // }
+  Future<double> getTotalSpendForCategory(
+    String category,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userUid = prefs.getString('userUID');
+
+      log(
+        '[getTotalSpendForCategory] UID: $userUid | Category: $category | From: $startDate | To: $endDate',
+      );
+
+      if (userUid == null) throw Exception('User not logged in');
+
+      final snapshot =
+          await _firestore
+              .collection('transactions')
+              .where('uid', isEqualTo: userUid)
+              .where('type', isEqualTo: 'expense')
+              .where('title', isEqualTo: category)
+              .where(
+                'timestamp',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+              )
+              .where(
+                'timestamp',
+                isLessThanOrEqualTo: Timestamp.fromDate(endDate),
+              )
+              .get();
+
+      log(
+        '[getTotalSpendForCategory] Transactions matched: ${snapshot.docs.length}',
+      );
+
+      double totalSpend = 0.0;
+      for (var doc in snapshot.docs) {
+        totalSpend += (doc['amount'] as num).toDouble();
+        log(
+          '  ↪ Spent: ${doc['amount']} | Title: ${doc['title']} | Time: ${doc['timestamp']}',
+        );
+      }
+
+      log('[getTotalSpendForCategory] Total Spent: $totalSpend');
+      return totalSpend;
+    } catch (e, stack) {
+      log('❌ [getTotalSpendForCategory] Error', error: e, stackTrace: stack);
+      return 0.0;
+    }
+  }
 
   Future<void> addBudget(
     String category,
@@ -167,16 +199,74 @@ class ExpenseStatisticsProvider with ChangeNotifier {
     }
   }
 
+  Future<void> addOrUpdateBudget(
+    String category,
+    double amountLimit,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userUid = prefs.getString('userUID');
+      if (userUid == null) throw Exception('User not logged in');
+
+      final snapshot =
+          await _firestore
+              .collection('budgets')
+              .where('uid', isEqualTo: userUid)
+              .get();
+
+      QueryDocumentSnapshot<Map<String, dynamic>>? matchingDoc;
+
+      try {
+        matchingDoc = snapshot.docs.firstWhere(
+          (doc) =>
+              (doc['category'] as String).toLowerCase() ==
+              category.toLowerCase(),
+        );
+      } catch (e) {
+        matchingDoc = null;
+      }
+
+      if (matchingDoc != null) {
+        final existingAmount = (matchingDoc['amountLimit'] as num).toDouble();
+        final newAmount = existingAmount + amountLimit;
+
+        await matchingDoc.reference.update({
+          'amountLimit': newAmount,
+          'endDate': endDate,
+        });
+
+        log('Updated existing budget for $category: $newAmount');
+      } else {
+        final newBudget = {
+          'category': category,
+          'amountLimit': amountLimit,
+          'startDate': startDate,
+          'endDate': endDate,
+          'uid': userUid,
+        };
+
+        await _firestore.collection('budgets').add(newBudget);
+        log('Created new budget for $category');
+      }
+
+      await fetchBudgets();
+      notifyListeners();
+    } catch (e, stack) {
+      log('addOrUpdateBudget error', error: e, stackTrace: stack);
+      rethrow;
+    }
+  }
+
   Future<void> fetchBudgets() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userUid = prefs.getString('userUID');
 
-      if (userUid == null) {
-        throw Exception('User not logged in');
-      }
+      log('[fetchBudgets] UID: $userUid');
 
-      log('Fetching budgets for user: $userUid');
+      if (userUid == null) throw Exception('User not logged in');
 
       final snapshot =
           await _firestore
@@ -185,27 +275,43 @@ class ExpenseStatisticsProvider with ChangeNotifier {
               .get();
 
       List<Map<String, dynamic>> fetchedCategories = [];
+
       for (var doc in snapshot.docs) {
         String category = doc['category'];
-        double amountLimit = doc['amountLimit'];
+        double amountLimit = (doc['amountLimit'] as num).toDouble();
+        DateTime startDate = (doc['startDate'] as Timestamp).toDate();
+        DateTime endDate = (doc['endDate'] as Timestamp).toDate();
 
-        log('Processing category: $category with limit: $amountLimit');
+        log(
+          '[fetchBudgets] Processing: $category | Limit: $amountLimit | Start: $startDate | End: $endDate',
+        );
 
-        //double totalSpendForCategory = await getTotalSpendForCategory(category);
+        double totalSpent = await getTotalSpendForCategory(
+          category,
+          startDate,
+          endDate,
+        );
+        double percentage =
+            amountLimit > 0 ? (totalSpent / amountLimit) * 100 : 0.0;
 
         fetchedCategories.add({
           'title': category,
-          'amount': amountLimit,
-          //'totalSpent': totalSpendForCategory,
+          'spent': totalSpent,
+          'budget': amountLimit,
+          'percentage': percentage,
         });
+
+        log(
+          '[fetchBudgets] Result → $category: Spent $totalSpent of $amountLimit (${percentage.toStringAsFixed(0)}%)',
+        );
       }
 
       _categories = fetchedCategories;
-      log('Updated _categories with ${_categories.length} entries');
+      log('[fetchBudgets] Total Categories Processed: ${_categories.length}');
       notifyListeners();
     } catch (e, stack) {
-      log('Failed to fetch budgets', error: e, stackTrace: stack, level: 1000);
-      throw Exception('Failed to fetch budgets: $e');
+      log('❌ [fetchBudgets] Error', error: e, stackTrace: stack);
+      rethrow;
     }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,17 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   final List<String> _methods = ['Cash', 'Card', 'eWallet'];
   final List<String> _types = ['Income', 'Expense'];
 
+  final List<String> _categories = [
+    'Food',
+    'Transport',
+    'Shopping',
+    'Bills',
+    'Other',
+  ];
+  String _selectedCategory = 'Food';
+  final TextEditingController _customCategoryController =
+      TextEditingController();
+
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -43,6 +56,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }
 
   late WatchConnectivity _watchConnectivity = WatchConnectivity();
+
   Future<void> _saveTransaction() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -59,14 +73,19 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       return;
     }
 
+    final String title =
+        _selectedCategory == 'Other'
+            ? _customCategoryController.text.trim()
+            : _selectedCategory;
+
     final newTx = {
       'amount': double.parse(_amountController.text),
-      'title': _titleController.text.trim(),
+      'title': title,
       'method': _selectedMethod,
-      'type': _selectedType,
+      'type': _selectedType.toLowerCase(),
       'date': _dateController.text.trim(),
       'uid': uid,
-      'timestamp': Timestamp.now(),
+      'timestamp': Timestamp.fromDate(_selectedDate),
     };
 
     try {
@@ -79,15 +98,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Transaction saved!')));
 
-      //For Watch Notification
-      sendNotification(
-        "New " +
-            _titleController.text.trim() +
-            " " +
-            _selectedType +
-            " is Added!",
-      );
-      //
+      // For Watch Notification
+      sendNotification("New $title $_selectedType is Added!");
 
       Navigator.pop(context);
     } catch (e) {
@@ -99,6 +111,28 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     setState(() => _isSaving = false);
   }
+
+  void getAllBudgets() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final uid = prefs.getString('userUID');
+
+    List<Map<String, dynamic>> userBudgets = await fetchUserBudgets(uid!);
+    log("the above is Budget");
+    print(userBudgets.toString());
+  }
+
+  Future<List<Map<String, dynamic>>> fetchUserBudgets(String uid) async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('budgets')
+            .where('uid', isEqualTo: uid)
+            .get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  void updateBudgetSpent() {}
 
   void sendNotification(String name) async {
     try {
@@ -117,6 +151,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   @override
   void initState() {
     super.initState();
+    getAllBudgets();
     _dateController.text = DateFormat.yMMMMd().format(_selectedDate);
   }
 
@@ -146,13 +181,35 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             : null,
               ),
 
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty ? 'Enter a title' : null,
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                items:
+                    _categories.map((category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCategory = value!;
+                  });
+                },
+                decoration: const InputDecoration(labelText: 'Category'),
               ),
+              if (_selectedCategory == 'Other')
+                TextFormField(
+                  controller: _customCategoryController,
+                  decoration: const InputDecoration(
+                    labelText: 'Custom Category',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a category';
+                    }
+                    return null;
+                  },
+                ),
 
               TextFormField(
                 controller: _dateController,

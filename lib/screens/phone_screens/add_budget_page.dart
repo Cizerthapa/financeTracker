@@ -1,4 +1,6 @@
 import 'package:finance_track/providers/expense_statistics_provider.dart';
+import 'package:finance_track/providers/transaction_provider.dart';
+import 'package:finance_track/screens/phone_screens/expense_statistics_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +56,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
       await Provider.of<ExpenseStatisticsProvider>(
         context,
         listen: false,
-      ).addBudget(
+      ).addOrUpdateBudget(
         _selectedCategory,
         double.parse(_amountController.text.trim()),
         _startDate!,
