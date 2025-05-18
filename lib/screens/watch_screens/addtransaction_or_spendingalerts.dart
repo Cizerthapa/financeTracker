@@ -50,7 +50,7 @@ class _AddtransactionOrSpendingalertsState extends State<AddtransactionOrSpendin
                       ),
                       onPressed: ()
                       {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ExpenseEntry(category: "",)));
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => ExpenseEntry(category: "",)));
 
                       },
                       child: Text(
