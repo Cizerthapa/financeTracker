@@ -82,7 +82,14 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
       return;
     }
     DateTime now = DateTime.now();
-    String formattedDate = DateFormat('d MMMM, y').format(now);
+    String formattedDate = DateFormat('MMMM d, y').format(now);
+
+    print(double.parse(_controller.text));
+    print(widget.cateogries);
+    print(isIncome ? "Income" : "Expenses");
+    print(formattedDate);
+    print(uid);
+    print(Timestamp.now());
 
     final newTx = {
       'amount': double.parse(_controller.text),
