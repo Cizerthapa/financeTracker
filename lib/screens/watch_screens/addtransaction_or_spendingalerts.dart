@@ -3,6 +3,9 @@ import 'package:finance_track/screens/watch_screens/spending_alerts.dart';
 import 'package:finance_track/screens/watch_screens/watchwearos_homescreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/notification_provider.dart';
 
 class AddtransactionOrSpendingalerts extends StatefulWidget {
   const AddtransactionOrSpendingalerts({super.key});
@@ -23,6 +26,20 @@ class _AddtransactionOrSpendingalertsState extends State<AddtransactionOrSpendin
     }
 
   }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Delay access until after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+     setState(() {
+       print("Notification: $notification");
+     });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(

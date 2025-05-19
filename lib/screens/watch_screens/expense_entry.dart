@@ -10,6 +10,7 @@ import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/login_provider.dart';
 
+import '../../providers/notification_provider.dart';
 import '../../providers/transaction_provider.dart';
 import 'categories.dart';
 
@@ -46,6 +47,14 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+
+      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+
+      setState(() {
+        print("Notification: $notification");
+      });
+
+
     });
 
   }
@@ -151,26 +160,31 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal:25, vertical: 6),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
                       ),
                       onPressed: () {
-                       Navigator.push(context, MaterialPageRoute(builder: (context) => Categories()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Categories()));
                       },
                       child: Row(
-                        mainAxisSize: MainAxisSize.min, // Adjust size based on content
+                        mainAxisSize: MainAxisSize.min, // 👈 Important to avoid overflow
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.tag_rounded, size: 16, color: Colors.black87),
-            
-                          Text(
-                            widget.cateogries.isEmpty ? "Title" : widget.cateogries,
-                            style: TextStyle(fontSize: 12, color: Colors.black87),
+                          SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              widget.cateogries.isEmpty ? "Title" : widget.cateogries,
+                              style: TextStyle(fontSize: 12, color: Colors.black87),
+                              overflow: TextOverflow.ellipsis, // 👈 Prevents long text overflow
+                            ),
                           ),
                         ],
                       ),
                     ),
+
                     SizedBox(height: 2,),
                     Center(
                       child: Row(

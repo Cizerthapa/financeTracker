@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/login_provider.dart';
+import '../../providers/notification_provider.dart';
 
 
 class BudgetSummary extends StatefulWidget {
@@ -29,6 +30,13 @@ class _BudgetSummaryState extends State<BudgetSummary> {
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+
+      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+
+      setState(() {
+        print("Notification: $notification");
+      });
+
     });
 
   }
@@ -50,11 +58,11 @@ class _BudgetSummaryState extends State<BudgetSummary> {
               child: Column(
                 children: [
                   Text(
-                    "Dec, 2025",
+                    "Budget Summary",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14
+                        fontSize: 12
                     ),
                   ),
 

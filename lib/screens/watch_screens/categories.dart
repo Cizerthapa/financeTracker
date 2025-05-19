@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/login_provider.dart';
+import '../../providers/notification_provider.dart';
 
 class Categories extends StatefulWidget {
   const Categories({super.key});
@@ -37,6 +38,13 @@ class _CategoriesState extends State<Categories> {
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+
+      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+
+      setState(() {
+        print("Notification: $notification");
+      });
+
     });
 
   }

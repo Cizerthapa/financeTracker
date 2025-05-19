@@ -68,19 +68,17 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
         }
 
       Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+
+      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+
+      setState(() {
+        print("Notification: $notification");
+      });
     });
 
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //
-  //
-  //   final notification = context.watch<NotificationProvider>().notification;
-  //
-  //   print("Notification: $notification");
-  // }
+
 
     @override
   Widget build(BuildContext context) {
@@ -112,6 +110,7 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                       padding: EdgeInsets.only(left: 60),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Total Balance',
@@ -125,7 +124,7 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                             "₨. ${provider.totalIncome.toStringAsFixed(2)}",
                             style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.bold
+                                fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],

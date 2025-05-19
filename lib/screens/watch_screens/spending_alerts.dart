@@ -6,6 +6,7 @@ import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/login_provider.dart';
 
+import '../../providers/notification_provider.dart';
 import 'addtransaction_or_spendingalerts.dart';
 
 class SpendingAlerts extends StatefulWidget {
@@ -35,6 +36,13 @@ class _SpendingAlertsState extends State<SpendingAlerts>
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+
+      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+
+      setState(() {
+        print("Notification: $notification");
+      });
+
     });
 
   }
@@ -71,7 +79,7 @@ class _SpendingAlertsState extends State<SpendingAlerts>
                         return Column(
                           children: [
                             Container(
-                    
+
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.all(Radius.circular(10.0)),

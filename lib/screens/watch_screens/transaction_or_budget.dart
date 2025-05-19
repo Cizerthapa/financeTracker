@@ -3,6 +3,9 @@ import 'package:finance_track/screens/watch_screens/transaction_history.dart';
 import 'package:finance_track/screens/watch_screens/watchwearos_homescreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/notification_provider.dart';
 
 class TransactionOrBudget extends StatefulWidget {
   const TransactionOrBudget({super.key});
@@ -22,6 +25,18 @@ class _TransactionOrBudgetState extends State<TransactionOrBudget> {
     }
 
   }
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+
+      print("Notification: $notification");
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(
