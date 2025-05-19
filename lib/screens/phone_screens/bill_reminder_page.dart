@@ -288,7 +288,7 @@ class _BillReminderPageState extends State<BillReminderPage> {
           floatingActionButton: FloatingActionButton(
             onPressed: () => _showAddReminderDialog(context),
             backgroundColor: const Color(0xff0077A3),
-            child: const Icon(Icons.add),
+            child: const Icon(Icons.add,color: Colors.white),
           ),
         );
       },
