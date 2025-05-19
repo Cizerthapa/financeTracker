@@ -7,7 +7,6 @@ import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../providers/MessageProvider.dart';
 import '../../providers/login_provider.dart';
-import '../../providers/notification_provider.dart';
 
 class Categories extends StatefulWidget {
   const Categories({super.key});
@@ -17,7 +16,6 @@ class Categories extends StatefulWidget {
 }
 
 class _CategoriesState extends State<Categories> {
-
   final List<String> category = [
     'Rent',
     'Loan',
@@ -32,15 +30,13 @@ class _CategoriesState extends State<Categories> {
     'Shopping',
     'Other',
   ];
-  late WatchConnectivity watchConnectivity;
 
+  late WatchConnectivity watchConnectivity;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
   void showNotification(String name) async {
-
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'basic_channel',
       'Basic Notifications',
       importance: Importance.max,
@@ -48,37 +44,39 @@ class _CategoriesState extends State<Categories> {
       showWhen: false,
     );
 
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
+    const NotificationDetails platformDetails =
+    NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
-      "Notification",
+      'Notification',
       name,
-      platformChannelSpecifics,
+      platformDetails,
     );
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    watchConnectivity = WatchConnectivity();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
 
-      const AndroidInitializationSettings initializationSettingsAndroid =
+    watchConnectivity = WatchConnectivity();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginProvider>(context, listen: false)
+          .wearOsLogout(watchConnectivity, context);
+
+      const AndroidInitializationSettings androidSettings =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      const InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+      const InitializationSettings initSettings =
+      InitializationSettings(android: androidSettings);
 
-      flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      flutterLocalNotificationsPlugin.initialize(initSettings);
+
       try {
         watchConnectivity.messageStream.listen((message) {
           try {
             if (message.containsKey("notification")) {
-
               showNotification(message["notification"]);
               Provider.of<MessageProvider>(context, listen: false)
                   .addMessage(message["notification"]);
@@ -99,65 +97,41 @@ class _CategoriesState extends State<Categories> {
         print(stackTrace);
       }
     });
-
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Color(0xFF1D85B1),
-<<<<<<< HEAD
-        child: Padding(padding: EdgeInsets.only(left: 15, right: 15, top: 20),
-        child: Container(
-          child: ListView.builder(
-              itemCount: category.length,
-              itemBuilder: (BuildContext context, int index) {
-            return Container(
-
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: InkWell(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ExpenseEntry(cateogries: category[index])));
-            },
-            child: Container(
-
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10.0))
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(category[index]),
-              ),
-=======
-        child: Padding(
-          padding: EdgeInsets.only(left: 15, right: 15, top: 20),
-          child: Container(
-            child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Rent'),
+        color: const Color(0xFF1D85B1),
+        padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
+        child: ListView.builder(
+          itemCount: category.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ExpenseEntry(
+                        cateogries: category[index],
                       ),
                     ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                );
-              },
->>>>>>> 65d963a0c7547f9cf5d19cabe558af55a22f0ac1
-            ),
-          ),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(category[index]),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

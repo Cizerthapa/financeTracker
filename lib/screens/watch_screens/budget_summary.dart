@@ -100,7 +100,7 @@ class _BudgetSummaryState extends State<BudgetSummary> {
       body: GestureDetector(
         onPanUpdate: (details) => handleSwipe(context, details),
         child: Container(
-<<<<<<< HEAD
+
             color: Color(0xFF1D85B1),
             width: double.infinity,
             height: double.infinity,
@@ -115,23 +115,8 @@ class _BudgetSummaryState extends State<BudgetSummary> {
                         fontWeight: FontWeight.bold,
                         fontSize: 12
                     ),
-=======
-          color: Color(0xFF1D85B1),
-          width: double.infinity,
-          height: double.infinity,
-          child: Padding(
-            padding: EdgeInsets.only(left: 20, right: 20, top: 10),
-            child: Column(
-              children: [
-                Text(
-                  'Dec, 2025',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
->>>>>>> 65d963a0c7547f9cf5d19cabe558af55a22f0ac1
                   ),
-                ),
+
 
                 Expanded(
                   child: ListView.builder(
