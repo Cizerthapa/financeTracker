@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,17 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   final List<String> _methods = ['Cash', 'Card', 'eWallet'];
   final List<String> _types = ['Income', 'Expense'];
 
+  final List<String> _categories = [
+    'Food',
+    'Transport',
+    'Shopping',
+    'Bills',
+    'Other',
+  ];
+  String _selectedCategory = 'Food';
+  final TextEditingController _customCategoryController =
+      TextEditingController();
+
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -41,7 +54,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       });
     }
   }
+
   late WatchConnectivity _watchConnectivity = WatchConnectivity();
+
   Future<void> _saveTransaction() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -52,9 +67,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     if (uid == null) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in.')));
       return;
     }
     print(double.parse(_amountController.text));
@@ -65,31 +80,37 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     print(uid);
     print(Timestamp.now());
 
+    final String title =
+        _selectedCategory == 'Other'
+            ? _customCategoryController.text.trim()
+            : _selectedCategory;
+
     final newTx = {
       'amount': double.parse(_amountController.text),
-      'title': _titleController.text.trim(),
+      'title': title,
       'method': _selectedMethod,
-      'type': _selectedType,
+      'type': _selectedType.toLowerCase(),
       'date': _dateController.text.trim(),
       'uid': uid,
-      'timestamp': Timestamp.now(),
+      'timestamp': Timestamp.fromDate(_selectedDate),
     };
 
     try {
-      await Provider.of<TransactionProvider>(context, listen: false)
-          .addTransaction(newTx);
+      await Provider.of<TransactionProvider>(
+        context,
+        listen: false,
+      ).addTransaction(newTx);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Transaction saved!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Transaction saved!')));
 
-      //For Watch Notification
-      sendNotification("New " +_titleController.text.trim() + " " + _selectedType + " is Added!");
-      //
+      // For Watch Notification
+      sendNotification("New $title $_selectedType is Added!");
 
       Navigator.pop(context);
     } catch (e) {
-      print("Error: $e");
+      print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to save transaction.')),
       );
@@ -98,34 +119,46 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     setState(() => _isSaving = false);
   }
 
+  void getAllBudgets() async {
+    final prefs = await SharedPreferences.getInstance();
 
+    final uid = prefs.getString('userUID');
 
-  void sendNotification(var name) async {
-    if (await _watchConnectivity.isReachable)
-    {
-      try {
-        await _watchConnectivity.sendMessage({
-          "notification": name,
-        });
-        print("Message sent to Mobile O");
-      }
-      catch (e)
-      {
-        print("Failed to send message: $e");
-
-      }
-    }
-    else
-    {
-      print("Mobile OS device is not reachable");
-
-    }
+    List<Map<String, dynamic>> userBudgets = await fetchUserBudgets(uid!);
+    log("the above is Budget");
+    print(userBudgets.toString());
   }
 
+  Future<List<Map<String, dynamic>>> fetchUserBudgets(String uid) async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('budgets')
+            .where('uid', isEqualTo: uid)
+            .get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  void updateBudgetSpent() {}
+
+  void sendNotification(String name) async {
+    try {
+      if (await _watchConnectivity.isSupported &&
+          await _watchConnectivity.isReachable) {
+        await _watchConnectivity.sendMessage({"notification": name});
+        print("Message sent to wearable");
+      } else {
+        print("Wearable not supported or not reachable");
+      }
+    } catch (e) {
+      print("Failed to send message: $e");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    getAllBudgets();
     _dateController.text = DateFormat.yMMMMd().format(_selectedDate);
   }
 
@@ -146,18 +179,44 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 controller: _amountController,
                 decoration: const InputDecoration(labelText: 'Amount'),
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                value == null || value.isEmpty || double.tryParse(value) == null
-                    ? 'Enter a valid amount'
-                    : null,
+                validator:
+                    (value) =>
+                        value == null ||
+                                value.isEmpty ||
+                                double.tryParse(value) == null
+                            ? 'Enter a valid amount'
+                            : null,
               ),
 
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Enter a title' : null,
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                items:
+                    _categories.map((category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCategory = value!;
+                  });
+                },
+                decoration: const InputDecoration(labelText: 'Category'),
               ),
+              if (_selectedCategory == 'Other')
+                TextFormField(
+                  controller: _customCategoryController,
+                  decoration: const InputDecoration(
+                    labelText: 'Custom Category',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a category';
+                    }
+                    return null;
+                  },
+                ),
 
               TextFormField(
                 controller: _dateController,
@@ -171,9 +230,15 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
               DropdownButtonFormField<String>(
                 value: _selectedMethod,
-                items: _methods
-                    .map((method) => DropdownMenuItem(value: method, child: Text(method)))
-                    .toList(),
+                items:
+                    _methods
+                        .map(
+                          (method) => DropdownMenuItem(
+                            value: method,
+                            child: Text(method),
+                          ),
+                        )
+                        .toList(),
                 onChanged: (value) {
                   setState(() {
                     _selectedMethod = value!;
@@ -184,9 +249,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
               DropdownButtonFormField<String>(
                 value: _selectedType,
-                items: _types
-                    .map((type) => DropdownMenuItem(value: type, child: Text(type)))
-                    .toList(),
+                items:
+                    _types
+                        .map(
+                          (type) =>
+                              DropdownMenuItem(value: type, child: Text(type)),
+                        )
+                        .toList(),
                 onChanged: (value) {
                   setState(() {
                     _selectedType = value!;
@@ -200,13 +269,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               _isSaving
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
-                onPressed: _saveTransaction,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff0077A3),
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Save Transaction'),
-              ),
+                    onPressed: _saveTransaction,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff0077A3),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Save Transaction'),
+                  ),
             ],
           ),
         ),

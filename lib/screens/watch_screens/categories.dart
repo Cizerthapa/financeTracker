@@ -108,6 +108,7 @@ class _CategoriesState extends State<Categories> {
     return Scaffold(
       body: Container(
         color: Color(0xFF1D85B1),
+<<<<<<< HEAD
         child: Padding(padding: EdgeInsets.only(left: 15, right: 15, top: 20),
         child: Container(
           child: ListView.builder(
@@ -131,13 +132,33 @@ class _CategoriesState extends State<Categories> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(category[index]),
               ),
+=======
+        child: Padding(
+          padding: EdgeInsets.only(left: 15, right: 15, top: 20),
+          child: Container(
+            child: ListView.builder(
+              itemCount: 10,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Rent'),
+                      ),
+                    ),
+                  ),
+                );
+              },
+>>>>>>> 65d963a0c7547f9cf5d19cabe558af55a22f0ac1
             ),
           ),
         ),
-
-            );}
-            ),
-        ),),
       ),
     );
   }

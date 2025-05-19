@@ -1,9 +1,89 @@
+import 'package:finance_track/components/widgets/flowchart_widget.dart';
+import 'package:finance_track/screens/phone_screens/category_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import '../../providers/expense_statistics_provider.dart'; // Ensure this path is correct
+import 'package:intl/intl.dart';
+import '../../providers/expense_statistics_provider.dart';
+import 'add_budget_page.dart';
+import 'dart:developer';
 
-class ExpenseStatisticsPage extends StatelessWidget {
+class ExpenseStatisticsPage extends StatefulWidget {
   const ExpenseStatisticsPage({super.key});
+
+  @override
+  State<ExpenseStatisticsPage> createState() => _ExpenseStatisticsPageState();
+}
+
+class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
+  DateTime selectedDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    log('[initState] Calling fetchBudgets()');
+    context.read<ExpenseStatisticsProvider>().fetchBudgets();
+  }
+
+  Future<void> _pickMonthYear() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(primary: Color(0xff0077A3)),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+        log('[DatePicker] Selected month/year: ${picked.month}-${picked.year}');
+      });
+    }
+  }
+
+  Future<bool> _confirmDelete(BuildContext context, String category) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Confirm Delete'),
+            content: Text('Are you sure you want to delete "$category"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (shouldDelete == true) {
+      log('[Delete] Deleting category: $category');
+      await context.read<ExpenseStatisticsProvider>().deleteBudget(category);
+      return true;
+    }
+
+    return false;
+  }
+
+  String get formattedMonthYear {
+    return DateFormat('MMMM, yyyy').format(selectedDate);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,98 +96,151 @@ class ExpenseStatisticsPage extends StatelessWidget {
         backgroundColor: const Color(0xff0077A3),
         elevation: 0,
         centerTitle: true,
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.arrow_back_ios, size: 16),
-            SizedBox(width: 4),
-            Text("December, 2024"),
-            SizedBox(width: 4),
-            Icon(Icons.arrow_forward_ios, size: 16),
-          ],
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.filter_alt_outlined),
+        title: GestureDetector(
+          onTap: _pickMonthYear,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.calendar_month, size: 20.sp, color: Colors.white),
+              SizedBox(width: 8.w),
+              Text(
+                formattedMonthYear,
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       body: Column(
         children: [
-          // Summary Section
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                SummaryItem(
-                  label: "Expenses",
-                  amount: "\$${statsProvider.totalExpenses.toStringAsFixed(2)}",
-                ),
-                SummaryItem(
-                  label: "Income",
-                  amount: "\$${statsProvider.totalIncome.toStringAsFixed(2)}",
-                ),
-                SummaryItem(
-                  label: "Total",
-                  amount: "\$${statsProvider.total.toStringAsFixed(2)}",
-                ),
-              ],
-            ),
-          ),
+          FutureBuilder<double>(
+            future: statsProvider.getTotalBudgetSet(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: const CircularProgressIndicator(),
+                );
+              }
 
-          // Category Breakdown
+              final totalBudgetSet = snapshot.data ?? 0.0;
+              final totalSpend = statsProvider.totalExpenses;
+              final progress =
+                  totalBudgetSet > 0 ? totalSpend / totalBudgetSet : 0.0;
+
+              log(
+                '[UI] Total Budget: $totalBudgetSet | Total Spent: $totalSpend | Progress: ${progress * 100}%',
+              );
+
+              return Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  children: [
+                    Text(
+                      'Spent: ₹${totalSpend.toStringAsFixed(2)} / Budget: ₹${totalBudgetSet.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    buildPieChart(categories),
+                  ],
+                ),
+              );
+            },
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
+                final title = (category['title'] ?? 'Untitled') as String;
+                final spent = (category['spent'] as num?)?.toDouble() ?? 0.0;
+                final budget = (category['budget'] as num?)?.toDouble() ?? 0.0;
+                final percentage = budget > 0 ? (spent / budget) * 100 : 0.0;
+
+                log(
+                  '[UI] → $title | Spent: $spent | Budget: $budget | Percentage: ${percentage.toStringAsFixed(0)}%',
+                );
+
                 return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 8.h,
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                  child: Dismissible(
+                    key: Key(title), // Make sure this is unique
+                    direction: DismissDirection.endToStart,
+                    confirmDismiss: (direction) async {
+                      return await _confirmDelete(context, title);
+                    },
+                    background: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title and Percentage
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => CategoryDetailScreen(
+                                  title: title,
+                                  spent: spent,
+                                  budget: budget,
+                                  percentage: percentage,
+                                ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              category['title'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                                Text(
+                                  '${percentage.toStringAsFixed(0)}%',
+                                  style: TextStyle(fontSize: 12.sp),
+                                ),
+                              ],
                             ),
-                            Text(
-                              "${category['percentage'].toStringAsFixed(0)}%",
+                            SizedBox(height: 8.h),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.r),
+                              child: LinearProgressIndicator(
+                                value: percentage / 100,
+                                backgroundColor: Colors.grey.shade300,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  spent > budget ? Colors.red : Colors.green,
+                                ),
+                                minHeight: 8.h,
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-
-                        // Progress Bar
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value: category['percentage'] / 100,
-                            backgroundColor: Colors.grey.shade300,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xff0b2e38),
-                            ),
-                            minHeight: 8,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 );
@@ -116,24 +249,16 @@ class ExpenseStatisticsPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class SummaryItem extends StatelessWidget {
-  final String label;
-  final String amount;
-
-  const SummaryItem({super.key, required this.label, required this.amount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        Text(amount, style: const TextStyle(color: Colors.black)),
-      ],
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddBudgetPage()),
+          );
+        },
+        child: Icon(Icons.add, color: Colors.black, size: 24.sp),
+      ),
     );
   }
 }

@@ -29,7 +29,6 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Theme Switch
           SwitchListTile(
             title: const Text('Dark Mode'),
             value: Provider.of<ThemeProvider>(context).isDarkMode,

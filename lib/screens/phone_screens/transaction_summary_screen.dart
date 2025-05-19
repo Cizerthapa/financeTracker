@@ -1,3 +1,4 @@
+import 'package:finance_track/components/widgets/balance_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -14,16 +15,16 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
   bool _isLoading = true;
   bool _isInitialized = false;
   DateTime _selectedMonth = DateTime.now();
-
   String _selectedTypeFilter = 'All';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
-      Provider.of<TransactionProvider>(context, listen: false)
-          .fetchTransactionsFromFirebase()
-          .then((_) {
+      Provider.of<TransactionProvider>(
+        context,
+        listen: false,
+      ).fetchTransactionsFromFirebase().then((_) {
         setState(() {
           _isLoading = false;
           _isInitialized = true;
@@ -59,14 +60,18 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
     final filteredTransactions = provider.transactions.where((tx) {
       try {
         final txDate = DateFormat.yMMMMd().parse(tx.date);
-        final matchesDate = txDate.month == _selectedMonth.month && txDate.year == _selectedMonth.year;
+        final matchesDate =
+            txDate.month == _selectedMonth.month && txDate.year == _selectedMonth.year;
         final matchesType = _selectedTypeFilter == 'All' || tx.type == _selectedTypeFilter;
         return matchesDate && matchesType;
       } catch (e) {
         return false;
       }
-    }
-    ).toList();
+    }).toList();
+
+    final balance = provider.balance;
+    final income = provider.totalIncome;
+    final expenses = provider.totalExpenses;
 
     final groupedTx = <String, List<TransactionModel>>{};
     for (var tx in filteredTransactions) {
@@ -85,11 +90,14 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.calendar_month, size: 20, color: Colors.white),
-
               const SizedBox(width: 8),
               Text(
                 formattedMonthYear,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
@@ -102,17 +110,17 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
                 _selectedTypeFilter = value;
               });
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'All', child: Text('All')),
-              const PopupMenuItem(value: 'Income', child: Text('Income')),
-              const PopupMenuItem(value: 'Expense', child: Text('Expense')),
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: 'All', child: Text('All')),
+              PopupMenuItem(value: 'Income', child: Text('Income')),
+              PopupMenuItem(value: 'Expense', child: Text('Expense')),
             ],
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xff0077A3),
+        foregroundColor: Colors.black,
         onPressed: () {
           Navigator.push(
             context,
@@ -133,59 +141,141 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SummaryItem(
-                  label: "Expenses",
-                  amount: "₨${provider.totalExpenses.toStringAsFixed(2)}",
+                  label: 'Expenses',
+                  amount: '₨${expenses.toStringAsFixed(2)}',
                 ),
                 SummaryItem(
-                  label: "Income",
-                  amount: "₨${provider.totalIncome.toStringAsFixed(2)}",
+                  label: 'Income',
+                  amount: '₨${income.toStringAsFixed(2)}',
                 ),
                 SummaryItem(
-                  label: "Total",
-                  amount: "₨${provider.totalAmount.toStringAsFixed(2)}",
+                  label: 'Total',
+                  amount: '₨${balance.toStringAsFixed(2)}',
                 ),
               ],
             ),
           ),
+          BalanceCard(balance: balance),
           Expanded(
             child: groupedTx.isEmpty
-                ? const Center(child: Text("Nothing to show", style: TextStyle(color: Colors.white, fontSize: 16)))
+                ? const Center(
+              child: Text(
+                'Nothing to show',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            )
                 : ListView(
               children: groupedTx.entries.map((entry) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Text(entry.key, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    ),
-                    ...entry.value.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text(item.method, style: TextStyle(color: Colors.grey[600])),
-                              ],
-                            ),
-                            Text(
-                              "${item.type == 'Income' ? '▲' : '▼'} ₨${item.amount.abs().toStringAsFixed(2)}",
-                              style: TextStyle(
-                                color: item.type == 'Income' ? Colors.green : Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      child: Text(
+                        entry.key,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    )),
+                    ),
+                    ...entry.value.map((item) {
+                      return Dismissible(
+                        key: Key(item.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding:
+                          const EdgeInsets.symmetric(horizontal: 20),
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.delete,
+                              color: Colors.white),
+                        ),
+                        confirmDismiss: (direction) async {
+                          return await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Delete Transaction'),
+                              content: const Text(
+                                  'Are you sure you want to delete this transaction?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(ctx).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(ctx).pop(true),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        onDismissed: (direction) async {
+                          await Provider.of<TransactionProvider>(
+                            context,
+                            listen: false,
+                          ).deleteTransaction(item.id);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.title,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item.method,
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  '${item.type == 'Income' ? '▲' : '▼'} ₨${item.amount.abs().toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: item.type == 'Income'
+                                        ? Colors.green
+                                        : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ],
                 );
               }).toList(),

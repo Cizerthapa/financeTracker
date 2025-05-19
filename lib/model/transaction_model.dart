@@ -1,36 +1,43 @@
 class TransactionModel {
+  final String id;
   final String title;
   final double amount;
-  final String method;
   final String date;
-  final String type; // New field added
+  final String method;
+  final String? type;
+  final String? category;
 
   TransactionModel({
+    required this.id,
     required this.title,
     required this.amount,
-    required this.method,
     required this.date,
-    required this.type,
+    required this.method,
+    this.type,
+    this.category,
   });
 
-  factory TransactionModel.fromMap(Map<String, dynamic> map) {
+  factory TransactionModel.fromMap(Map<String, dynamic> data) {
     return TransactionModel(
-      amount: (map['amount'] as num).toDouble(),
-      date: map['date'] ?? '',
-      method: map['method'] ?? '',
-      title: map['title'] ?? '',
-      type: (map['type'] ?? 'Expense').toString(), // Default to "Expense"
+      id: data['id'] ?? '',
+      title: data['title'] ?? '',
+      amount: (data['amount'] as num).toDouble(),
+      date: data['date'] ?? '',
+      method: data['method'] ?? '',
+      type: data['type'] ?? '',
+      category: data['category'] ?? '', // <-- map from Firestore
     );
   }
 
-
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
+      'title': title,
       'amount': amount,
       'date': date,
       'method': method,
-      'title': title,
-      'type': type, // Include 'type' in map
+      'type': type,
+      'category': category, // <-- include in upload
     };
   }
 }

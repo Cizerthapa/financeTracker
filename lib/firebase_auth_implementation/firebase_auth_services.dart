@@ -15,9 +15,9 @@ class FirebaseAuthService {
       );
       return credential.user;
     } catch (e) {
-      debugPrint("Error Occured" + e.toString());
+      debugPrint('Error Occurred: ${e.toString()}');
+      rethrow;
     }
-    return null;
   }
 
   Future<User?> signInWithEmailAndPassword(
@@ -31,7 +31,7 @@ class FirebaseAuthService {
       );
       return credential.user;
     } catch (e) {
-      debugPrint("Error Occured" + e.toString());
+      debugPrint('Error Occured' + e.toString());
     }
     return null;
   }

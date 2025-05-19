@@ -1,10 +1,10 @@
 import 'package:finance_track/providers/login_provider.dart';
+import 'package:finance_track/utils/input_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
 import '../../firebase_auth_implementation/firebase_auth_services.dart';
-
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -15,13 +15,12 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-{
-
+class _LoginScreenState extends State<LoginScreen> {
   late WatchConnectivity _watchConnectivity;
   final FirebaseAuthService _auth = FirebaseAuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // Moved this above its usage
 
   bool _obscureText = true;
   bool _isLoggingIn = false;
@@ -31,41 +30,30 @@ class _LoginScreenState extends State<LoginScreen>
     super.initState();
     _watchConnectivity = WatchConnectivity();
 
-    _watchConnectivity.messageStream.listen((message){
-
-      if(message["UserSession"])
-        {
-          isLogggedIn();
-
-        }
-      else
-        {
-          print("false login");
-        }
-    });
-
-  }
-
-
-  void isLogggedIn() async {
-    if (await _watchConnectivity.isReachable) {
-      try {
-
-        await _watchConnectivity.sendMessage({
-          "auth_message": "Not Login",
-        });
-        print("Message sent to Mobile OS");
-      } catch (e) {
-        print("Failed to send message: $e");
-
+    _watchConnectivity.messageStream.listen((message) {
+      if (message["UserSession"] == true) {
+        isLoggedIn();
+      } else {
+        print("false login");
       }
-    } else {
-      print("Mobile OS device is not reachable");
-
-    }
-
+    });
   }
 
+  void isLoggedIn() async {
+    try {
+      if (await _watchConnectivity.isSupported &&
+          await _watchConnectivity.isReachable) {
+        await _watchConnectivity.sendMessage({"auth_message": "Not Login"});
+        print("Message sent to Mobile OS");
+      } else {
+        print(
+          "WatchConnectivity not supported or not reachable on this device",
+        );
+      }
+    } catch (e) {
+      print("WatchConnectivity error: $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -75,40 +63,43 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _signIn() async {
-    setState(()
-    {
-      _isLoggingIn = true;
-    });
+    if (!_formKey.currentState!.validate()) return;
 
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
+    setState(() => _isLoggingIn = true);
 
-    final user = await _auth.signInWithEmailAndPassword(email, password);
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
 
-    setState(()
-    {
-      _isLoggingIn = false;
-    });
+      final user = await _auth.signInWithEmailAndPassword(email, password);
 
-    if (user != null)
-    {
-      final loginProvider = Provider.of<LoginProvider>(context, listen: false);
-      loginProvider.login(email, password, _watchConnectivity);
+      setState(() => _isLoggingIn = false);
 
+      if (user != null) {
+        final loginProvider = Provider.of<LoginProvider>(
+          context,
+          listen: false,
+        );
+        await loginProvider.login(email, password, _watchConnectivity);
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Sign in successful!')));
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FinanceHomeScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed. Please try again.')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoggingIn = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Sign in successful!")));
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const FinanceHomeScreen()),
-      );
-    }
-    else
-    {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sign in failed. Please try again.")),
-      );
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
   }
 
@@ -134,54 +125,72 @@ class _LoginScreenState extends State<LoginScreen>
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
-                const Text('Email', style: TextStyle(color: Colors.white)),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    hintText: 'example@gmail.com',
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text('Password', style: TextStyle(color: Colors.white)),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _obscureText,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey[700],
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Email',
+                        style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: InputValidators.validateEmail,
+                        decoration: InputDecoration(
+                          hintText: 'example@gmail.com',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Password',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscureText,
+                        validator: InputValidators.validatePassword,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your Password',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey[700],
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -237,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Don’t have an account? ",
+                      'Don’t have an account? ',
                       style: TextStyle(color: Colors.white),
                     ),
                     TextButton(
@@ -267,7 +276,4 @@ class _LoginScreenState extends State<LoginScreen>
       ),
     );
   }
-
-
-
 }
