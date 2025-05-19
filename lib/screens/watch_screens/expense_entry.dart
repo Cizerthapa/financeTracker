@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
-import '../../providers/MessageProvider.dart';
+import '../../providers/notification_message_provider.dart';
 import '../../providers/login_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/transaction_provider.dart';

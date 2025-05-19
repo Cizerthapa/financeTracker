@@ -7,7 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
-import '../../providers/MessageProvider.dart';
+import '../../providers/notification_message_provider.dart';
 import '../../providers/notification_provider.dart';
 
 class TransactionOrBudget extends StatefulWidget {

@@ -1,4 +1,4 @@
-import 'package:finance_track/providers/MessageProvider.dart';
+import 'package:finance_track/providers/notification_message_provider.dart';
 import 'package:finance_track/providers/bill_reminder_provider.dart';
 import 'package:finance_track/providers/expense_statistics_provider.dart';
 import 'package:finance_track/providers/home_provider.dart';
