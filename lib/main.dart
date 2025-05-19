@@ -9,8 +9,10 @@ import 'package:finance_track/providers/registerProvider.dart';
 import 'package:finance_track/providers/theme_provider.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:finance_track/screens/phone_screens/splash_screen.dart';
+import 'package:finance_track/utils/NotificationService.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,11 +21,38 @@ import 'package:is_wear/is_wear.dart';
 
 final _isWearPlugin = IsWear();
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+Future<void> initializeNotifications() async {
+  const AndroidInitializationSettings androidSettings =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initSettings =
+  InitializationSettings(android: androidSettings);
+
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  final bool? result = await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+      IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+}
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   bool isWears = await _isWearPlugin.check() ?? false;
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await NotificationService.init();
+
+  await initializeNotifications();
 
   runApp(
     ScreenUtilInit(
@@ -43,7 +72,7 @@ void main() async {
               ChangeNotifierProvider(
                 create: (_) => ExpenseStatisticsProvider(),
               ),
-              ChangeNotifierProvider(create: (_) => BillReminderProvider()),
+              ChangeNotifierProvider(create: (_) => BillReminderProvider(flutterLocalNotificationsPlugin)),
               ChangeNotifierProvider(create: (_) => LoginSession()),
               ChangeNotifierProvider(create: (_) => NotificationProvider()),
             ],
