@@ -2,9 +2,11 @@ import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:finance_track/screens/watch_screens/transaction_or_budget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
+import '../../providers/MessageProvider.dart';
 import '../../providers/login_provider.dart';
 import '../../providers/notification_provider.dart';
 
@@ -25,6 +27,34 @@ class _TransactionHistoryState extends State<TransactionHistory> {
     }
   }
   late WatchConnectivity watchConnectivity;
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  void showNotification(String name) async {
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'basic_channel',
+      'Basic Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      "Notification",
+      name,
+      platformChannelSpecifics,
+    );
+  }
+
+
+
   @override
   void initState() {
     super.initState();
@@ -34,15 +64,40 @@ class _TransactionHistoryState extends State<TransactionHistory> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final loginProvider = Provider.of<LoginProvider>(context, listen: false);
       final transactionProvider = Provider.of<TransactionProvider>(context, listen: false);
-      final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
 
-      // Call necessary provider methods
       loginProvider.wearOsLogout(watchConnectivity, context);
       transactionProvider.fetchTransactionsFromFirebase();
+      const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      // Get notification (just printing here)
-      final notification = notificationProvider.notification;
-      print("Notification: $notification");
+      const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+
+      flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      try {
+        watchConnectivity.messageStream.listen((message) {
+          try {
+            if (message.containsKey("notification")) {
+
+              showNotification(message["notification"]);
+              Provider.of<MessageProvider>(context, listen: false)
+                  .addMessage(message["notification"]);
+              print("Received message 'notification' key: $message");
+            } else {
+              print("Received message without 'notification' key: $message");
+            }
+          } catch (e, stackTrace) {
+            print("Error processing incoming message: $e");
+            print(stackTrace);
+          }
+        }, onError: (error, stackTrace) {
+          print("Error in messageStream listener: $error");
+          print(stackTrace);
+        });
+      } catch (e, stackTrace) {
+        print("Error setting up messageStream listener: $e");
+        print(stackTrace);
+      }
     });
   }
 
@@ -97,9 +152,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                                       child: Row(
                                         children: [
-                                          Text(
-                                            item.title,
-                                            style: TextStyle(fontSize: 10, color: Colors.black),
+                                          Container(
+                                            width: 80,
+                                            child: Text(
+                                              item.title,
+                                              style: const TextStyle(fontSize: 10, color: Colors.black),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                           Spacer(),
                                           Row(

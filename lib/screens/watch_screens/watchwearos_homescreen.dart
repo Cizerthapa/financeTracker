@@ -6,8 +6,10 @@ import 'package:finance_track/screens/watch_screens/transaction_history.dart';
 import 'package:finance_track/screens/watch_screens/transaction_or_budget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
+import '../../providers/MessageProvider.dart';
 import '../../providers/login_provider.dart';
 import '../../providers/transaction_provider.dart';
 import 'authorize.dart';
@@ -48,11 +50,43 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
   bool _isLoading = true;
   bool _isInitialized = false;
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  void showNotification(String name) async {
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'basic_channel',
+      'Basic Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      "Notification",
+      name,
+      platformChannelSpecifics,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
 
     watchConnectivity = WatchConnectivity();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+    InitializationSettings(android: initializationSettingsAndroid);
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
 
@@ -67,20 +101,39 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
       });
         }
 
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      // Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      //       //
+      //       // print("Initial notification: ${notificationProvider.notification}");
+      try {
+        watchConnectivity.messageStream.listen((message) {
+          try {
+            if (message.containsKey("notification")) {
 
-      final notification = Provider.of<NotificationProvider>(context, listen: false).notification;
+              showNotification(message["notification"]);
+              Provider.of<MessageProvider>(context, listen: false)
+                  .addMessage(message["notification"]);
+              print("Received message 'notification' key: $message");
+            } else {
+              print("Received message without 'notification' key: $message");
+            }
+          } catch (e, stackTrace) {
+            print("Error processing incoming message: $e");
+            print(stackTrace);
+          }
+        }, onError: (error, stackTrace) {
+          print("Error in messageStream listener: $error");
+          print(stackTrace);
+        });
+      } catch (e, stackTrace) {
+        print("Error setting up messageStream listener: $e");
+        print(stackTrace);
+      }
 
-      setState(() {
-        print("Notification: $notification");
-      });
     });
-
   }
 
 
-
-    @override
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
     final groupedTx = provider.groupedTransactions;

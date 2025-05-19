@@ -1,3 +1,4 @@
+import 'package:finance_track/providers/MessageProvider.dart';
 import 'package:finance_track/providers/bill_reminder_provider.dart';
 import 'package:finance_track/providers/expense_statistics_provider.dart';
 import 'package:finance_track/providers/home_provider.dart';
@@ -13,17 +14,24 @@ import 'package:finance_track/screens/phone_screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'utils/firebase_options.dart';
 import 'package:is_wear/is_wear.dart';
 
+import 'package:permission_handler/permission_handler.dart';  // <-- Added
+import 'utils/firebase_options.dart';
 
 final _isWearPlugin = IsWear();
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  bool isWears = await _isWearPlugin.check()??false;
+
+
+  await _requestNotificationPermission();
+
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+
+  bool isWear = await _isWearPlugin.check() ?? false;
 
   runApp(
     MultiProvider(
@@ -34,15 +42,26 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => ExpenseStatisticsProvider()),
         ChangeNotifierProvider(create: (_) => BillReminderProvider()),
         ChangeNotifierProvider(create: (_) => LoginSession()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => MessageProvider()),
       ],
-      child: MyApp(isWear: isWears),
+      child: MyApp(isWear: isWear),
     ),
   );
+}
+
+Future<void> _requestNotificationPermission() async {
+  // Request permission using permission_handler package
+  if (await Permission.notification.isDenied) {
+    final status = await Permission.notification.request();
+    if (status.isGranted) {
+      print('Notification permission granted');
+    } else {
+      print('Notification permission denied');
+    }
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -54,22 +73,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _initialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeFirebase();
-  }
-
-  Future<void> _initializeFirebase() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    setState(() {
-      _initialized = true;
-    });
-  }
+  bool _initialized = true; // Firebase already initialized before runApp
 
   @override
   Widget build(BuildContext context) {
@@ -86,8 +90,7 @@ class _MyAppState extends State<MyApp> {
       themeMode: themeProvider.themeMode,
       theme: themeProvider.lightTheme,
       darkTheme: themeProvider.darkTheme,
-      // home: widget.isWear ? WatchwearosHomescreen(): SplashScreen(),
-      home: SplashScreen(isWear: widget.isWear,),
+      home: SplashScreen(isWear: widget.isWear),
     );
   }
 }
