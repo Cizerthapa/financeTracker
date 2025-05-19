@@ -13,12 +13,8 @@ class SpendingAlerts extends StatefulWidget {
   State<SpendingAlerts> createState() => _SpendingAlertsState();
 }
 
-class _SpendingAlertsState extends State<SpendingAlerts>
-{
-
-  void handleSwipe(BuildContext context, DragUpdateDetails details)
-  {
-
+class _SpendingAlertsState extends State<SpendingAlerts> {
+  void handleSwipe(BuildContext context, DragUpdateDetails details) {
     double dx = details.delta.dx;
     if (dx > 10) {
       Navigator.of(context).pop();
@@ -27,23 +23,26 @@ class _SpendingAlertsState extends State<SpendingAlerts>
         context,
         MaterialPageRoute(builder: (context) => AddNewBudget()),
       );
-    }
-    else if(dx < -10)
-    {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBudget()));
+    } else if (dx < -10) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddNewBudget()),
+      );
     }
   }
 
   late WatchConnectivity watchConnectivity;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
-      });
-    }
+      Provider.of<LoginProvider>(
+        context,
+        listen: false,
+      ).wearOsLogout(watchConnectivity, context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

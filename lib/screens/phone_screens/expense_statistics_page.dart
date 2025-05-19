@@ -55,7 +55,7 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
       builder:
           (ctx) => AlertDialog(
             title: const Text('Confirm Delete'),
-            content: Text('Are you sure you want to delete "$category"?'),
+            content: Text("Are you sure you want to delete '$category'?"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(false),

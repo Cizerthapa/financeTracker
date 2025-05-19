@@ -21,16 +21,18 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
       Navigator.of(context).pop();
     }
   }
+
   late WatchConnectivity watchConnectivity;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      Provider.of<LoginProvider>(
+        context,
+        listen: false,
+      ).wearOsLogout(watchConnectivity, context);
     });
-
   }
 
   @override
@@ -48,7 +50,8 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
               child: Center(
                 child: Column(
                   children: [
-                    Text("Add New Transaction",
+                    Text(
+                      'Add New Transaction',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white,
@@ -74,8 +77,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                         );
                       },
                       child: Row(
-                        mainAxisSize:
-                            MainAxisSize.min, // Adjust size based on content
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.tag_rounded,
@@ -112,9 +114,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                               print('Button Pressed');
                             },
                             child: Row(
-                              mainAxisSize:
-                                  MainAxisSize
-                                      .min, // Adjust size based on content
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.check_box_outline_blank,
@@ -149,9 +149,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                               print('Button Pressed');
                             },
                             child: Row(
-                              mainAxisSize:
-                                  MainAxisSize
-                                      .min, // Adjust size based on content
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.check_box_outline_blank,
@@ -178,10 +176,8 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white, // Set background color here
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ), // Set the border radius here
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
                             ),
                             child: SizedBox(
                               width: 155,
@@ -234,8 +230,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
                         print('Button Pressed');
                       },
                       child: Row(
-                        mainAxisSize:
-                            MainAxisSize.min, // Adjust size based on content
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'Done',

@@ -11,7 +11,7 @@ Widget buildPieChart(List<Map<String, dynamic>> categories) {
             final spent = c['spent'] ?? 0;
             final isValid = spent > 0;
             print(
-              '[Log] ➡️ Category "${c['title']}" has spent: $spent -> ${isValid ? "Included" : "Excluded"}',
+              "[Log] Category '${c['title']}' has spent: $spent -> ${isValid ? 'Included' : 'Excluded'}",
             );
             return isValid;
           })
@@ -23,7 +23,7 @@ Widget buildPieChart(List<Map<String, dynamic>> categories) {
                     Colors.primaries.length];
 
             print(
-              '[Log] ✅ Adding pie section: {title: $title, spent: $spent, color: $color}',
+              '[Log] Adding pie section: {title: $title, spent: $spent, color: $color}',
             );
 
             return PieChartSectionData(
@@ -36,7 +36,7 @@ Widget buildPieChart(List<Map<String, dynamic>> categories) {
           })
           .toList();
 
-  print('[Log] 🧩 Total sections generated: ${sections.length}');
+  print('[Log] Total sections generated: ${sections.length}');
 
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: 16.w),

@@ -14,22 +14,20 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-
   late WatchConnectivity watchConnectivity;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      Provider.of<LoginProvider>(
+        context,
+        listen: false,
+      ).wearOsLogout(watchConnectivity, context);
     });
-
   }
 
-  void handleSwipe(BuildContext context, DragUpdateDetails details)
-  {
-
+  void handleSwipe(BuildContext context, DragUpdateDetails details) {
     double dx = details.delta.dx;
     if (dx < -10) {
       Navigator.of(context).pop();

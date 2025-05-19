@@ -36,7 +36,7 @@ class LoginProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print("Login failed: $e");
+      print('Login failed: $e');
       throw Exception('Login Error: $e');
     }
   }
@@ -50,19 +50,19 @@ class LoginProvider with ChangeNotifier {
       final isReachable = await _watchConnectivity.isReachable;
 
       if (!isSupported) {
-        print("WatchConnectivity not supported on this device.");
+        print('WatchConnectivity not supported on this device.');
         return;
       }
 
       if (isReachable) {
-        await _watchConnectivity.sendMessage({"Accessed": true, "uid": uid});
-        print("Access message sent to Wear OS.");
+        await _watchConnectivity.sendMessage({'Accessed': true, 'uid': uid});
+        print('Access message sent to Wear OS.');
       } else {
-        print("Wear OS device is not reachable.");
+        print('Wear OS device is not reachable.');
       }
     } catch (e, stackTrace) {
-      print("Error in isAccessed: $e");
-      print("StackTrace: $stackTrace");
+      print('Error in isAccessed: $e');
+      print('StackTrace: $stackTrace');
     }
   }
 
@@ -72,19 +72,19 @@ class LoginProvider with ChangeNotifier {
       final isReachable = await _watchConnectivity.isReachable;
 
       if (!isSupported) {
-        print("WatchConnectivity not supported on this device.");
+        print('WatchConnectivity not supported on this device.');
         return;
       }
 
       if (isReachable) {
-        await _watchConnectivity.sendMessage({"isWearLoggedIn": true});
-        print("Message sent to Wear OS.");
+        await _watchConnectivity.sendMessage({'isWearLoggedIn': true});
+        print('Message sent to Wear OS.');
       } else {
-        print("Wear OS device is not reachable.");
+        print('Wear OS device is not reachable.');
       }
     } catch (e, stackTrace) {
-      print("Error in isLoggedIN: $e");
-      print("StackTrace: $stackTrace");
+      print('Error in isLoggedIN: $e');
+      print('StackTrace: $stackTrace');
     }
   }
 
@@ -99,10 +99,10 @@ class LoginProvider with ChangeNotifier {
 
       _isLoggedIn = false;
       notifyListeners();
-      print("Logout completed");
+      print('Logout completed');
     } catch (e, stackTrace) {
-      print("Error during logout: $e");
-      print("StackTrace: $stackTrace");
+      print('Error during logout: $e');
+      print('StackTrace: $stackTrace');
     }
   }
 
@@ -114,19 +114,19 @@ class LoginProvider with ChangeNotifier {
       final isReachable = await _watchConnectivity.isReachable;
 
       if (!isSupported) {
-        print("WatchConnectivity not supported on this device.");
+        print('WatchConnectivity not supported on this device.');
         return;
       }
 
       if (isReachable) {
-        await _watchConnectivity.sendMessage({"Logout": true});
-        print("Logout message sent to Wear OS.");
+        await _watchConnectivity.sendMessage({'Logout': true});
+        print('Logout message sent to Wear OS.');
       } else {
-        print("Wear OS device is not reachable.");
+        print('Wear OS device is not reachable.');
       }
     } catch (e, stackTrace) {
-      print("Error in isLogout: $e");
-      print("StackTrace: $stackTrace");
+      print('Error in isLogout: $e');
+      print('StackTrace: $stackTrace');
     }
   }
 
@@ -135,7 +135,7 @@ class LoginProvider with ChangeNotifier {
     BuildContext context,
   ) async {
     _watchConnectivity.messageStream.listen((message) {
-      if (message["Logout"] == true) {
+      if (message['Logout'] == true) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Authorize()),

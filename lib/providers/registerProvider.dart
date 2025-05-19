@@ -11,13 +11,14 @@ class RegisterProvider with ChangeNotifier {
     required String phone,
     required String password,
   }) {
-    final alreadyExists = _registeredUsers.any((user) => user['email'] == email);
+    final alreadyExists = _registeredUsers.any(
+      (user) => user['email'] == email,
+    );
 
     if (alreadyExists) {
       return false;
     }
 
-    // Save user
     _registeredUsers.add({
       'username': username,
       'email': email,

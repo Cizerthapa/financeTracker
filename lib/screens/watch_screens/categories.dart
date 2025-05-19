@@ -16,15 +16,15 @@ class _CategoriesState extends State<Categories> {
   late WatchConnectivity watchConnectivity;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      Provider.of<LoginProvider>(
+        context,
+        listen: false,
+      ).wearOsLogout(watchConnectivity, context);
     });
-
   }
-
 
   @override
   Widget build(BuildContext context) {

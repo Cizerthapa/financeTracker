@@ -1,4 +1,3 @@
-
 import 'package:finance_track/providers/notification_provider.dart';
 import 'package:finance_track/screens/watch_screens/spending_alerts.dart';
 import 'package:finance_track/screens/watch_screens/transaction_history.dart';
@@ -24,21 +23,26 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
     double dx = details.delta.dx;
     double dy = details.delta.dy;
 
-    if (dx > 10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ExpenseEntry()));
-    }
-    else if (dx < -10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => BudgetSummary()));
-    }
-    else if (dy > 10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionHistory()));
-    }
-    else if (dy < -10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => SpendingAlerts()));
+    if (dx > 10) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ExpenseEntry()),
+      );
+    } else if (dx < -10) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => BudgetSummary()),
+      );
+    } else if (dy > 10) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => TransactionHistory()),
+      );
+    } else if (dy < -10) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SpendingAlerts()),
+      );
     }
   }
 
@@ -53,46 +57,44 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
     watchConnectivity = WatchConnectivity();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isInitialized) {
+        Provider.of<TransactionProvider>(
+          context,
+          listen: false,
+        ).fetchTransactionsFromFirebase().then((_) {
+          setState(() {
+            _isLoading = false;
+            _isInitialized = true;
+          });
+        });
+      }
 
-      if(!_isInitialized)
-        {
-          Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase()
-      .then((_) {
-      setState(() {
-      _isLoading = false;
-      _isInitialized = true;
-      });
-      });
-        }
-
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      Provider.of<LoginProvider>(
+        context,
+        listen: false,
+      ).wearOsLogout(watchConnectivity, context);
     });
-
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-
     final notification = context.watch<NotificationProvider>().notification;
 
-    print("Notification: $notification");
+    print('Notification: $notification');
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
     final groupedTx = provider.groupedTransactions;
-
-
 
     return Scaffold(
       backgroundColor: Color(0xFF1D85B1),
       body: GestureDetector(
         onPanUpdate: (details) => handleSwipe(context, details),
         child: Stack(
-
           children: [
             Align(
               alignment: Alignment.topLeft,
@@ -100,9 +102,11 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                 width: 165,
                 height: 70,
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(50.0))
+                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(50.0),
+                  ),
                 ),
                 child: Stack(
                   children: [
@@ -114,16 +118,16 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                           Text(
                             'Total Balance',
                             style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.black
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
                             ),
                           ),
                           Text(
                             'Rs. 0.0',
                             style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -138,69 +142,94 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: Expanded(
-                  child: groupedTx.isEmpty
-                      ? const Center(child: Text("Nothing to show", style: TextStyle(color: Colors.white, fontSize: 12)))
-                      :ListView(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    children: groupedTx.entries
-                        .expand((entry) => entry.value)
-                        .take(2)
-                        .map((item) {
-                      return Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
+                  child:
+                      groupedTx.isEmpty
+                          ? const Center(
+                            child: Text(
+                              'Nothing to show',
+                              style: TextStyle(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      item.title,
-                                      style: TextStyle(fontSize: 10, color: Colors.black),
-                                    ),
-                                    Spacer(),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          item.type != 'Income'
-                                              ? Icons.arrow_drop_down_sharp
-                                              : Icons.arrow_drop_up_sharp,
-                                          color: item.type != 'Income' ? Colors.red : Colors.green,
-                                        ),
-                                        Text(
-                                          '\$${item.amount.abs().toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: item.type != 'Income' ? Colors.red : Colors.green,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                fontSize: 12,
                               ),
                             ),
-
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                          )
+                          : ListView(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            children:
+                                groupedTx.entries
+                                    .expand((entry) => entry.value)
+                                    .take(2)
+                                    .map((item) {
+                                      return Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10.0),
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 2,
+                                                    ),
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      item.title,
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    Spacer(),
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          item.type != 'Income'
+                                                              ? Icons
+                                                                  .arrow_drop_down_sharp
+                                                              : Icons
+                                                                  .arrow_drop_up_sharp,
+                                                          color:
+                                                              item.type !=
+                                                                      'Income'
+                                                                  ? Colors.red
+                                                                  : Colors
+                                                                      .green,
+                                                        ),
+                                                        Text(
+                                                          '\$${item.amount.abs().toStringAsFixed(2)}',
+                                                          style: TextStyle(
+                                                            fontSize: 10,
+                                                            color:
+                                                                item.type !=
+                                                                        'Income'
+                                                                    ? Colors.red
+                                                                    : Colors
+                                                                        .green,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    })
+                                    .toList(),
+                          ),
                 ),
               ),
             ),
-
-
-
-
-
-
 
             Positioned(
               bottom: -15,

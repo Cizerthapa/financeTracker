@@ -89,7 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Registration successful!")),
+            const SnackBar(content: Text('Registration successful!')),
           );
 
           Navigator.pushReplacement(
@@ -100,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Registration failed. Try again.")),
+            const SnackBar(content: Text('Registration failed. Try again.')),
           );
         }
       }
@@ -276,7 +276,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        "Already have an account? ",
+                        'Already have an account? ',
                         style: TextStyle(color: Colors.white, fontSize: 14),
                       ),
                       TextButton(

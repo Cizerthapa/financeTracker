@@ -41,7 +41,7 @@ class ExpenseStatisticsProvider with ChangeNotifier {
       );
       return totalBudgetSet;
     } catch (e, stack) {
-      log('❌ [getTotalBudgetSet] Error', error: e, stackTrace: stack);
+      log('[getTotalBudgetSet] Error', error: e, stackTrace: stack);
       rethrow;
     }
   }
@@ -72,10 +72,10 @@ class ExpenseStatisticsProvider with ChangeNotifier {
             (cat['title'] as String).toLowerCase() == category.toLowerCase(),
       );
 
-      log('✅ [deleteBudget] Deleted $category');
+      log('[deleteBudget] Deleted $category');
       notifyListeners();
     } catch (e, stack) {
-      log('❌ [deleteBudget] Error', error: e, stackTrace: stack);
+      log('[deleteBudget] Error', error: e, stackTrace: stack);
       rethrow;
     }
   }
@@ -159,7 +159,7 @@ class ExpenseStatisticsProvider with ChangeNotifier {
       log('[getTotalSpendForCategory] Total Spent: $totalSpend');
       return totalSpend;
     } catch (e, stack) {
-      log('❌ [getTotalSpendForCategory] Error', error: e, stackTrace: stack);
+      log('[getTotalSpendForCategory] Error', error: e, stackTrace: stack);
       return 0.0;
     }
   }
@@ -310,7 +310,7 @@ class ExpenseStatisticsProvider with ChangeNotifier {
       log('[fetchBudgets] Total Categories Processed: ${_categories.length}');
       notifyListeners();
     } catch (e, stack) {
-      log('❌ [fetchBudgets] Error', error: e, stackTrace: stack);
+      log('[fetchBudgets] Error', error: e, stackTrace: stack);
       rethrow;
     }
   }
