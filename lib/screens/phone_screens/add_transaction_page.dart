@@ -58,7 +58,10 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       return;
     }
     print(double.parse(_amountController.text));
-
+    print(_titleController.text.trim());
+    print(_selectedMethod);
+    print(_selectedType);
+    print(_dateController.text.trim());
     print(uid);
     print(Timestamp.now());
 

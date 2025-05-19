@@ -104,7 +104,7 @@ class _ExpenseEntryState extends State<ExpenseEntry> {
       'amount': double.parse(_controller.text),
       'title': widget.cateogries,
       'method': "Cash",
-      'type': isIncome ? "Income" : "Expenses",
+      'type': isIncome ? "Income" : "Expense",
       'date': formattedDate,
       'uid': uid,
       'timestamp': Timestamp.now(),
