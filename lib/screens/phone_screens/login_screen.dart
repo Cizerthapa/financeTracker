@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:finance_track/providers/login_provider.dart';
 import 'package:finance_track/utils/input_validator.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuthService _auth = FirebaseAuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Moved this above its usage
+  final _formKey = GlobalKey<FormState>();
 
   bool _obscureText = true;
   bool _isLoggingIn = false;
@@ -31,27 +33,24 @@ class _LoginScreenState extends State<LoginScreen> {
     _watchConnectivity = WatchConnectivity();
 
     _watchConnectivity.messageStream.listen((message) {
-      if (message["UserSession"] == true) {
-        isLoggedIn();
-      } else {
-        print("false login");
+      log('[Watch] Message received: $message');
+      if (message['UserSession'] == true) {
+        _notifyWatchNotLoggedIn();
       }
     });
   }
 
-  void isLoggedIn() async {
+  void _notifyWatchNotLoggedIn() async {
     try {
       if (await _watchConnectivity.isSupported &&
           await _watchConnectivity.isReachable) {
-        await _watchConnectivity.sendMessage({"auth_message": "Not Login"});
-        print("Message sent to Mobile OS");
+        await _watchConnectivity.sendMessage({'auth_message': 'Not Login'});
+        log('Watch notified: Not logged in');
       } else {
-        print(
-          "WatchConnectivity not supported or not reachable on this device",
-        );
+        log('Watch not reachable or unsupported');
       }
     } catch (e) {
-      print("WatchConnectivity error: $e");
+      log('WatchConnectivity error: $e');
     }
   }
 
@@ -62,20 +61,23 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() async {
+  Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoggingIn = true);
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    log('Attempting login for email: $email');
 
     try {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
-
       final user = await _auth.signInWithEmailAndPassword(email, password);
 
       setState(() => _isLoggingIn = false);
 
       if (user != null) {
+        log('Firebase login success: UID=${user.uid}');
+
         final loginProvider = Provider.of<LoginProvider>(
           context,
           listen: false,
@@ -91,12 +93,14 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (_) => const FinanceHomeScreen()),
         );
       } else {
+        log('Firebase returned null user');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login failed. Please try again.')),
         );
       }
     } catch (e) {
       setState(() => _isLoggingIn = false);
+      log('Exception during login: ${e.toString()}');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
@@ -128,66 +132,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 Form(
                   key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        'Email',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
+                      _buildLabel('Email'),
+                      _buildTextField(
                         controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
+                        hint: 'example@gmail.com',
                         validator: InputValidators.validateEmail,
-                        decoration: InputDecoration(
-                          hintText: 'example@gmail.com',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                        keyboardType: TextInputType.emailAddress,
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'Password',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
+                      _buildLabel('Password'),
+                      _buildTextField(
                         controller: _passwordController,
-                        obscureText: _obscureText,
+                        hint: 'Enter your Password',
                         validator: InputValidators.validatePassword,
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Password',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
+                        obscureText: _obscureText,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[700],
                           ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscureText
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey[700],
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _obscureText = !_obscureText;
-                              });
-                            },
-                          ),
+                          onPressed:
+                              () =>
+                                  setState(() => _obscureText = !_obscureText),
                         ),
                       ),
                     ],
@@ -200,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {},
                     child: const Text(
                       'Forgot your password?',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -208,13 +177,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
+                    onPressed: _isLoggingIn ? null : _signIn,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0D3343),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: _isLoggingIn ? null : _signIn,
                     child:
                         _isLoggingIn
                             ? const CircularProgressIndicator(
@@ -223,7 +192,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             : const Text(
                               'Sign In',
                               style: TextStyle(
-                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -261,9 +229,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -273,6 +241,43 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(text, style: const TextStyle(color: Colors.white)),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required String? Function(String?) validator,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      validator: validator,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        suffixIcon: suffixIcon,
       ),
     );
   }

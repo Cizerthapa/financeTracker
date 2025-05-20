@@ -25,7 +25,7 @@ class TransactionModel {
       date: data['date'] ?? '',
       method: data['method'] ?? '',
       type: data['type'] ?? '',
-      category: data['category'] ?? '', // <-- map from Firestore
+      category: data['category'] ?? '',
     );
   }
 
@@ -37,7 +37,7 @@ class TransactionModel {
       'date': date,
       'method': method,
       'type': type,
-      'category': category, // <-- include in upload
+      'category': category,
     };
   }
 }

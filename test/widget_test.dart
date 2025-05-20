@@ -13,11 +13,7 @@ import 'package:finance_track/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-<<<<<<< HEAD
-    await tester.pumpWidget(const MyApp(isWear: false));
-=======
     // await tester.pumpWidget(const MyApp());
->>>>>>> 65d963a0c7547f9cf5d19cabe558af55a22f0ac1
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

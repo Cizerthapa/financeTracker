@@ -3,6 +3,7 @@ import 'package:watch_connectivity/watch_connectivity.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationProvider with ChangeNotifier {
+
   late final WatchConnectivity _watchConnectivity;
   String _notification = "";
 
@@ -10,7 +11,7 @@ class NotificationProvider with ChangeNotifier {
   WatchConnectivity get watchConnectivity => _watchConnectivity;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   NotificationProvider() {
     try {

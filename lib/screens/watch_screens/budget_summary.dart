@@ -23,6 +23,7 @@ class _BudgetSummaryState extends State<BudgetSummary> {
     }
   }
 
+
   late WatchConnectivity watchConnectivity;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

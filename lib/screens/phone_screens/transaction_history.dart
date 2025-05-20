@@ -29,7 +29,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     final provider = Provider.of<TransactionProvider>(context);
     final transactions = provider.transactions;
 
-    // Group by date
     final grouped = <String, List<TransactionModel>>{};
     for (var tx in transactions) {
       grouped.putIfAbsent(tx.date, () => []).add(tx);
