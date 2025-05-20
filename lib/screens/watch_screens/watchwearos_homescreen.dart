@@ -1,11 +1,15 @@
 
 import 'package:finance_track/providers/notification_provider.dart';
+import 'package:finance_track/screens/watch_screens/addtransaction_or_spendingalerts.dart';
 import 'package:finance_track/screens/watch_screens/spending_alerts.dart';
 import 'package:finance_track/screens/watch_screens/transaction_history.dart';
+import 'package:finance_track/screens/watch_screens/transaction_or_budget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
+import '../../providers/notification_message_provider.dart';
 import '../../providers/login_provider.dart';
 import '../../providers/transaction_provider.dart';
 import 'authorize.dart';
@@ -26,31 +30,63 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
 
     if (dx > 10)
     {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ExpenseEntry()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddtransactionOrSpendingalerts()));
     }
     else if (dx < -10)
     {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => BudgetSummary()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionOrBudget()));
     }
-    else if (dy > 10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionHistory()));
-    }
-    else if (dy < -10)
-    {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => SpendingAlerts()));
-    }
+    // else if (dy > 10)
+    // {
+    //   Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionHistory()));
+    // }
+    // else if (dy < -10)
+    // {
+    //   Navigator.push(context, MaterialPageRoute(builder: (context) => SpendingAlerts()));
+    // }
   }
 
   late WatchConnectivity watchConnectivity;
   bool _isLoading = true;
   bool _isInitialized = false;
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  void showNotification(String name) async {
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'basic_channel',
+      'Basic Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      "Notification",
+      name,
+      platformChannelSpecifics,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
 
     watchConnectivity = WatchConnectivity();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+    InitializationSettings(android: initializationSettingsAndroid);
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
 
@@ -65,22 +101,39 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
       });
         }
 
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
-    });
+      // Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      //       //
+      //       // print("Initial notification: ${notificationProvider.notification}");
+      try {
+        watchConnectivity.messageStream.listen((message) {
+          try {
+            if (message.containsKey("notification")) {
 
+              showNotification(message["notification"]);
+              Provider.of<MessageProvider>(context, listen: false)
+                  .addMessage(message["notification"]);
+              print("Received message 'notification' key: $message");
+            } else {
+              print("Received message without 'notification' key: $message");
+            }
+          } catch (e, stackTrace) {
+            print("Error processing incoming message: $e");
+            print(stackTrace);
+          }
+        }, onError: (error, stackTrace) {
+          print("Error in messageStream listener: $error");
+          print(stackTrace);
+        });
+      } catch (e, stackTrace) {
+        print("Error setting up messageStream listener: $e");
+        print(stackTrace);
+      }
+
+    });
   }
+
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-
-    final notification = context.watch<NotificationProvider>().notification;
-
-    print("Notification: $notification");
-  }
-
-    @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
     final groupedTx = provider.groupedTransactions;
@@ -110,6 +163,7 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                       padding: EdgeInsets.only(left: 60),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Total Balance',
@@ -120,10 +174,10 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                             ),
                           ),
                           Text(
-                            'Rs. 0.0',
+                            "₨. ${provider.totalIncome.toStringAsFixed(2)}",
                             style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -174,7 +228,7 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                                           color: item.type != 'Income' ? Colors.red : Colors.green,
                                         ),
                                         Text(
-                                          '\$${item.amount.abs().toStringAsFixed(2)}',
+                                          'Rs. ${item.amount.abs().toStringAsFixed(2)}',
                                           style: TextStyle(
                                             fontSize: 10,
                                             color: item.type != 'Income' ? Colors.red : Colors.green,
@@ -233,9 +287,9 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                           ),
                         ),
                         Text(
-                          'Rs. 0.0',
+                          "₨. ${provider.totalExpenses.toStringAsFixed(2)}",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

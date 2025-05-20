@@ -72,6 +72,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       ).showSnackBar(const SnackBar(content: Text('User not logged in.')));
       return;
     }
+    print(double.parse(_amountController.text));
+    print(_titleController.text.trim());
+    print(_selectedMethod);
+    print(_selectedType);
+    print(_dateController.text.trim());
+    print(uid);
+    print(Timestamp.now());
 
     final String title =
         _selectedCategory == 'Other'

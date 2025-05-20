@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
+import '../../providers/notification_message_provider.dart';
 import '../../providers/login_provider.dart';
+import '../../providers/notification_provider.dart';
 
 class BudgetSummary extends StatefulWidget {
   const BudgetSummary({super.key});
@@ -19,6 +22,34 @@ class _BudgetSummaryState extends State<BudgetSummary> {
     }
   }
   late WatchConnectivity watchConnectivity;
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  void showNotification(String name) async {
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'basic_channel',
+      'Basic Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      "Notification",
+      name,
+      platformChannelSpecifics,
+    );
+  }
+
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -26,6 +57,39 @@ class _BudgetSummaryState extends State<BudgetSummary> {
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+
+      const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+      const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+
+      flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      try {
+        watchConnectivity.messageStream.listen((message) {
+          try {
+            if (message.containsKey("notification")) {
+
+              showNotification(message["notification"]);
+              Provider.of<MessageProvider>(context, listen: false)
+                  .addMessage(message["notification"]);
+              print("Received message 'notification' key: $message");
+            } else {
+              print("Received message without 'notification' key: $message");
+            }
+          } catch (e, stackTrace) {
+            print("Error processing incoming message: $e");
+            print(stackTrace);
+          }
+        }, onError: (error, stackTrace) {
+          print("Error in messageStream listener: $error");
+          print(stackTrace);
+        });
+      } catch (e, stackTrace) {
+        print("Error setting up messageStream listener: $e");
+        print(stackTrace);
+      }
+
     });
 
   }
@@ -36,21 +100,23 @@ class _BudgetSummaryState extends State<BudgetSummary> {
       body: GestureDetector(
         onPanUpdate: (details) => handleSwipe(context, details),
         child: Container(
-          color: Color(0xFF1D85B1),
-          width: double.infinity,
-          height: double.infinity,
-          child: Padding(
-            padding: EdgeInsets.only(left: 20, right: 20, top: 10),
-            child: Column(
-              children: [
-                Text(
-                  'Dec, 2025',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+
+            color: Color(0xFF1D85B1),
+            width: double.infinity,
+            height: double.infinity,
+            child: Padding(
+              padding: EdgeInsets.only(left: 20, right:20, top: 10),
+              child: Column(
+                children: [
+                  Text(
+                    "Budget Summary",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12
+                    ),
                   ),
-                ),
+
 
                 Expanded(
                   child: ListView.builder(
