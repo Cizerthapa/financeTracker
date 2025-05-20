@@ -14,9 +14,9 @@ class LoginSession with ChangeNotifier {
 
   void _startListening() {
     _watchConnectivity.messageStream.listen((message) {
-      if (message["UserSession"] == true) {
+      if (message['UserSession'] == true) {
         _userLoggedIn = true;
-        print("Listen Mobile");
+        print('Listen Mobile');
       }
 
       notifyListeners();

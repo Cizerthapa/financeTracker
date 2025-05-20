@@ -105,8 +105,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Transaction saved!')));
 
-      // For Watch Notification
-      sendNotification("New $title $_selectedType is Added!");
+      // Watch Notification
+      sendNotification('New $title $_selectedType is Added!');
 
       Navigator.pop(context);
     } catch (e) {
@@ -125,7 +125,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     final uid = prefs.getString('userUID');
 
     List<Map<String, dynamic>> userBudgets = await fetchUserBudgets(uid!);
-    log("the above is Budget");
+    log('the above is Budget');
     print(userBudgets.toString());
   }
 
@@ -145,13 +145,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     try {
       if (await _watchConnectivity.isSupported &&
           await _watchConnectivity.isReachable) {
-        await _watchConnectivity.sendMessage({"notification": name});
-        print("Message sent to wearable");
+        await _watchConnectivity.sendMessage({'notification': name});
+        print('Message sent to wearable');
       } else {
-        print("Wearable not supported or not reachable");
+        print('Wearable not supported or not reachable');
       }
     } catch (e) {
-      print("Failed to send message: $e");
+      print('Failed to send message: $e');
     }
   }
 
@@ -263,8 +263,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 },
                 decoration: const InputDecoration(labelText: 'Type'),
               ),
-
-              // Save Button
               const SizedBox(height: 24),
               _isSaving
                   ? const Center(child: CircularProgressIndicator())
