@@ -10,6 +10,7 @@ import 'package:finance_track/providers/theme_provider.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:finance_track/screens/phone_screens/splash_screen.dart';
 import 'package:finance_track/utils/NotificationService.dart';
+import 'package:finance_track/utils/budget_notification_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -52,11 +53,13 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // await NotificationService.init();
 
+  await BudgetNotificationService.initialize();
+
   await initializeNotifications();
 
   runApp(
     ScreenUtilInit(
-      designSize: const Size(375, 812), // Base size (e.g. iPhone X)
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder:

@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
+import '../utils/budget_notification_service.dart';
+
 class ExpenseStatisticsProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   double totalIncome = 0;
   List<Map<String, dynamic>> _categories = [];
+
+  final Set<String> _notifiedCategories = {};
+
 
   double get totalExpenses => _categories.fold(
     0.0,
@@ -259,20 +264,73 @@ class ExpenseStatisticsProvider with ChangeNotifier {
     }
   }
 
+  // Future<void> fetchBudgets() async {
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final userUid = prefs.getString('userUID');
+  //
+  //     log('[fetchBudgets] UID: $userUid');
+  //
+  //     if (userUid == null) throw Exception('User not logged in');
+  //
+  //     final snapshot =
+  //         await _firestore
+  //             .collection('budgets')
+  //             .where('uid', isEqualTo: userUid)
+  //             .get();
+  //
+  //     List<Map<String, dynamic>> fetchedCategories = [];
+  //
+  //     for (var doc in snapshot.docs) {
+  //       String category = doc['category'];
+  //       double amountLimit = (doc['amountLimit'] as num).toDouble();
+  //       DateTime startDate = (doc['startDate'] as Timestamp).toDate();
+  //       DateTime endDate = (doc['endDate'] as Timestamp).toDate();
+  //
+  //       log(
+  //         '[fetchBudgets] Processing: $category | Limit: $amountLimit | Start: $startDate | End: $endDate',
+  //       );
+  //
+  //       double totalSpent = await getTotalSpendForCategory(
+  //         category,
+  //         startDate,
+  //         endDate,
+  //       );
+  //       double percentage =
+  //           amountLimit > 0 ? (totalSpent / amountLimit) * 100 : 0.0;
+  //
+  //       fetchedCategories.add({
+  //         'title': category,
+  //         'spent': totalSpent,
+  //         'budget': amountLimit,
+  //         'percentage': percentage,
+  //       });
+  //
+  //       log(
+  //         '[fetchBudgets] Result → $category: Spent $totalSpent of $amountLimit (${percentage.toStringAsFixed(0)}%)',
+  //       );
+  //     }
+  //
+  //     _categories = fetchedCategories;
+  //     log('[fetchBudgets] Total Categories Processed: ${_categories.length}');
+  //     notifyListeners();
+  //   } catch (e, stack) {
+  //     log('[fetchBudgets] Error', error: e, stackTrace: stack);
+  //     rethrow;
+  //   }
+  // }
+
   Future<void> fetchBudgets() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userUid = prefs.getString('userUID');
 
-      log('[fetchBudgets] UID: $userUid');
-
       if (userUid == null) throw Exception('User not logged in');
 
-      final snapshot =
-          await _firestore
-              .collection('budgets')
-              .where('uid', isEqualTo: userUid)
-              .get();
+      final snapshot = await _firestore
+          .collection('budgets')
+          .where('uid', isEqualTo: userUid)
+          .get();
 
       List<Map<String, dynamic>> fetchedCategories = [];
 
@@ -282,17 +340,21 @@ class ExpenseStatisticsProvider with ChangeNotifier {
         DateTime startDate = (doc['startDate'] as Timestamp).toDate();
         DateTime endDate = (doc['endDate'] as Timestamp).toDate();
 
-        log(
-          '[fetchBudgets] Processing: $category | Limit: $amountLimit | Start: $startDate | End: $endDate',
-        );
-
         double totalSpent = await getTotalSpendForCategory(
           category,
           startDate,
           endDate,
         );
-        double percentage =
-            amountLimit > 0 ? (totalSpent / amountLimit) * 100 : 0.0;
+        double percentage = amountLimit > 0 ? (totalSpent / amountLimit) * 100 : 0.0;
+
+        if (percentage >= 90 && !_notifiedCategories.contains(category)) {
+          await BudgetNotificationService.showNotification(
+            id: category.hashCode,
+            title: 'Budget Alert: $category',
+            body: 'You have used ${percentage.toStringAsFixed(1)}% of your $category budget.',
+          );
+          _notifiedCategories.add(category);
+        }
 
         fetchedCategories.add({
           'title': category,
@@ -300,14 +362,9 @@ class ExpenseStatisticsProvider with ChangeNotifier {
           'budget': amountLimit,
           'percentage': percentage,
         });
-
-        log(
-          '[fetchBudgets] Result → $category: Spent $totalSpent of $amountLimit (${percentage.toStringAsFixed(0)}%)',
-        );
       }
 
       _categories = fetchedCategories;
-      log('[fetchBudgets] Total Categories Processed: ${_categories.length}');
       notifyListeners();
     } catch (e, stack) {
       log('[fetchBudgets] Error', error: e, stackTrace: stack);

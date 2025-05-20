@@ -185,7 +185,6 @@ class BillReminderProvider extends ChangeNotifier {
       priority: Priority.high,
       ticker: 'ticker',
     );
-
     const notificationDetails = NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
