@@ -79,8 +79,8 @@ class _FinanceHomeScreenState extends State<FinanceHomeScreen> {
           ),
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Stats'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.credit_card),
-            label: 'Cards',
+            icon: Icon(Icons.notifications_active ),
+            label: 'Reminder',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
