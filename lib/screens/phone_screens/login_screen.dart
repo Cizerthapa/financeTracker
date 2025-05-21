@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:finance_track/providers/login_provider.dart';
 import 'package:finance_track/utils/input_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
@@ -118,70 +119,68 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
-                const Text(
+             SizedBox(height: 40.h),
+              Text(
                   'Welcome Back!',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 24.sp,
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      _buildLabel('Email'),
-                      _buildTextField(
-                        controller: _emailController,
-                        hint: 'example@gmail.com',
-                        validator: InputValidators.validateEmail,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildLabel('Password'),
-                      _buildTextField(
-                        controller: _passwordController,
-                        hint: 'Enter your Password',
-                        validator: InputValidators.validatePassword,
-                        obscureText: _obscureText,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey[700],
-                          ),
-                          onPressed:
-                              () =>
-                                  setState(() => _obscureText = !_obscureText),
+                SizedBox(height: 40.h),
+               Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildLabel('Email'),
+                    SizedBox(height: 8.h),
+                    _buildTextField(
+                      controller: _emailController,
+                      hint: 'example@gmail.com',
+                      validator: InputValidators.validateEmail,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    SizedBox(height: 20.h),
+                    _buildLabel('Password'),
+                    SizedBox(height: 8.h),
+                    _buildTextField(
+                      controller: _passwordController,
+                      hint: 'Enter your Password',
+                      validator: InputValidators.validatePassword,
+                      obscureText: _obscureText,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey[700],
                         ),
+                        onPressed: () => setState(() => _obscureText = !_obscureText),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+              ),
+              SizedBox(height: 12.h),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
-                    child: const Text(
+                    child:  Text(
                       'Forgot your password?',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white, fontSize: 14.sp),
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                 SizedBox(height: 8.h),
                 SizedBox(
-                  height: 48,
+                  height: 48.h,
                   child: ElevatedButton(
                     onPressed: _isLoggingIn ? null : _signIn,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0D3343),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
                     child:
@@ -189,16 +188,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? const CircularProgressIndicator(
                               color: Colors.white,
                             )
-                            : const Text(
+                            :  Text(
                               'Sign In',
                               style: TextStyle(
+                                fontSize: 16.sp,
+
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                   ),
                 ),
-                const SizedBox(height: 30),
+              SizedBox(height: 30.h),
                 Row(
                   children: const [
                     Expanded(child: Divider(color: Colors.white70)),
@@ -209,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(child: Divider(color: Colors.white70)),
                   ],
                 ),
-                const SizedBox(height: 20),
+              SizedBox(height: 20.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

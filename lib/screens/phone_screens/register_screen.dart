@@ -5,6 +5,7 @@ import 'package:finance_track/utils/input_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../firebase_auth_implementation/firebase_auth_services.dart';
 import 'login_screen.dart';
@@ -151,34 +152,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 30),
-                  const Text(
+                 SizedBox(height: 30.h),
+                Text(
                     'Create new account!',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 24.sp,
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8.h),
+                  Text(
                     'Create an account to login!',
-                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                    style: TextStyle(fontSize: 14.sp, color: Colors.white70),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 30),
+                   SizedBox(height: 30.h),
 
-                  const Text('Username', style: TextStyle(color: Colors.white)),
-                  const SizedBox(height: 8),
+                   Text('Username', style: TextStyle(color: Colors.white)),
+                  SizedBox(height: 8.h),
                   _inputField(
                     hint: 'Enter your username',
                     controller: _usernameController,
                     validator: InputValidators.validateUsername,
                   ),
-                  const SizedBox(height: 16),
-                  const Text('Email', style: TextStyle(color: Colors.white)),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 16.h),
+                  Text('Email', style: TextStyle(color: Colors.white)),
+                 SizedBox(height: 8.h),
                   _inputField(
                     hint: 'example@gmail.com',
                     controller: _emailController,
@@ -186,18 +187,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: InputValidators.validateEmail,
                   ),
 
-                  const SizedBox(height: 16),
-                  const Text('Phone', style: TextStyle(color: Colors.white)),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 16.h),
+                 Text('Phone', style: TextStyle(color: Colors.white)),
+                  SizedBox(height: 8.h),
                   _inputField(
                     hint: 'Enter your phone',
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
                     validator: InputValidators.validatePhone,
                   ),
-                  const SizedBox(height: 16),
-                  const Text('Password', style: TextStyle(color: Colors.white)),
-                  const SizedBox(height: 8),
+                   SizedBox(height: 16.h),
+                   Text('Password', style: TextStyle(color: Colors.white)),
+                  SizedBox(height: 8.h),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -230,9 +231,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                 SizedBox(height: 24.h),
                   SizedBox(
-                    height: 48,
+                    height: 48.h,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0D3343),
@@ -246,10 +247,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )
-                              : const Text(
+                              : Text(
                                 'Signup',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -257,7 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 30),
+                 SizedBox(height: 30.h),
                   Row(
                     children: const [
                       Expanded(child: Divider(color: Colors.white70)),
@@ -323,7 +324,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           vertical: 14,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
       ),
