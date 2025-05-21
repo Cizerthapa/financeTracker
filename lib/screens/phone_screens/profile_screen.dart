@@ -3,6 +3,7 @@ import 'package:finance_track/screens/phone_screens/settings_screen.dart';
 import 'package:finance_track/screens/phone_screens/transaction_history.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
@@ -26,38 +27,38 @@ class ProfilePage extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              const SizedBox(height: 16),
-              const Align(
+               SizedBox(height: 16.h),
+             Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'My Account',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20.sp),
                 ),
               ),
-              const SizedBox(height: 16),
+             SizedBox(height: 16.h),
 
               // Profile Picture & Name
               CircleAvatar(
-                radius: 40,
+                radius: 40.r,
                 backgroundImage: NetworkImage(provider_profile.profileImage),
               ),
-              const SizedBox(height: 12),
+               SizedBox(height: 12.h),
               Text(
                 provider_profile.name,
-                style: const TextStyle(
-                  fontSize: 20,
+                style: TextStyle(
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
 
               // Spending Overview Card
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
                 padding: const EdgeInsets.all(16),
@@ -70,15 +71,15 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(color: Colors.white70),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     RichText(
                       text: TextSpan(
                         children: [
                           TextSpan(
                             text:
                                 '\$${provider_profile.totalSpent.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style:  TextStyle(
+                              fontSize: 24.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -95,13 +96,13 @@ class ProfilePage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                     SizedBox(height: 12.h),
                     LinearProgressIndicator(
                       value: percentageSpent,
                       backgroundColor: Colors.white24,
                       color: Colors.amberAccent,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     // Legend (simplified)
                     Column(
                       children:
@@ -112,14 +113,14 @@ class ProfilePage extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 10,
-                                    height: 10,
+                                    width: 10.w,
+                                    height: 10.h,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: color,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                  SizedBox(width: 8.w),
                                   Text(
                                     entry.key,
                                     style: const TextStyle(color: Colors.white),
@@ -138,7 +139,7 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
 
               // Action Buttons
               _buildCardButton(
@@ -184,7 +185,7 @@ class ProfilePage extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: 12),
+             SizedBox(height: 12.h),
               const Text(
                 "Let’s track your expenses.",
                 style: TextStyle(color: Colors.white70),
@@ -220,7 +221,7 @@ class ProfilePage extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black12,

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finance_track/providers/transaction_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -170,7 +171,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         backgroundColor: const Color(0xff0077A3),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0.h),
         child: Form(
           key: _formKey,
           child: ListView(
@@ -265,7 +266,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               ),
 
               // Save Button
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               _isSaving
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(

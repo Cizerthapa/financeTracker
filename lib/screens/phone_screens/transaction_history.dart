@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../model/transaction_model.dart';
 import '../../providers/transaction_provider.dart';
@@ -97,7 +98,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                       SizedBox(height: 4.h),
                                         Text(
                                           tx.method,
                                           style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:finance_track/providers/bill_reminder_provider.dart';
 
@@ -71,7 +72,7 @@ class _BillReminderPageState extends State<BillReminderPage> {
                                         ? 'Title is required'
                                         : null,
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           TextFormField(
                             controller: amountController,
                             keyboardType: const TextInputType.numberWithOptions(
@@ -91,7 +92,7 @@ class _BillReminderPageState extends State<BillReminderPage> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 12),
+                         SizedBox(height: 12.h),
                           ElevatedButton.icon(
                             onPressed: () => pickDate(context, true, setState),
                             icon: const Icon(Icons.date_range),
@@ -101,7 +102,7 @@ class _BillReminderPageState extends State<BillReminderPage> {
                                   : 'Start: ${startDate!.toLocal().toString().split(' ')[0]}',
                             ),
                           ),
-                          const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                           ElevatedButton.icon(
                             onPressed: () => pickDate(context, false, setState),
                             icon: const Icon(Icons.event),
@@ -114,13 +115,13 @@ class _BillReminderPageState extends State<BillReminderPage> {
                           if (startDate != null &&
                               dueDate != null &&
                               dueDate!.isBefore(startDate!))
-                            const Padding(
+                             Padding(
                               padding: EdgeInsets.only(top: 8),
                               child: Text(
                                 'Due date must be after start date.',
                                 style: TextStyle(
                                   color: Colors.red,
-                                  fontSize: 12,
+                                  fontSize: 12.sp,
                                 ),
                               ),
                             ),
@@ -129,9 +130,9 @@ class _BillReminderPageState extends State<BillReminderPage> {
                               padding: const EdgeInsets.only(top: 8),
                               child: Text(
                                 dateErrorText!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.red,
-                                  fontSize: 12,
+                                  fontSize: 12.sp,
                                 ),
                               ),
                             ),
@@ -252,18 +253,18 @@ class _BillCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style:  TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: 6),
+         SizedBox(height: 6.h),
           Text(
             '\$${amount.toStringAsFixed(2)}',
-            style: const TextStyle(
-              fontSize: 22,
+            style:  TextStyle(
+              fontSize: 22.sp,
               fontWeight: FontWeight.bold,
               color: Color(0xFF0B2E38),
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text('Start Date: ${startDate.toLocal().toString().split(' ')[0]}'),
           Text('Due Date: ${dueDate.toLocal().toString().split(' ')[0]}'),
         ],

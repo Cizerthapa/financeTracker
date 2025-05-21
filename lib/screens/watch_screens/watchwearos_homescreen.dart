@@ -137,9 +137,6 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
     final groupedTx = provider.groupedTransactions;
-
-
-
     return Scaffold(
       backgroundColor: Color(0xFF1D85B1),
       body: GestureDetector(

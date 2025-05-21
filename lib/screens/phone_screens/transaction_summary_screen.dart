@@ -1,5 +1,6 @@
 import 'package:finance_track/components/widgets/balance_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../model/transaction_model.dart';
@@ -252,7 +253,7 @@ class _TransactionSummaryPageState extends State<TransactionSummaryPage> {
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    const SizedBox(height: 4),
+                                  SizedBox(height: 4.h),
                                     Text(
                                       item.method,
                                       style: TextStyle(

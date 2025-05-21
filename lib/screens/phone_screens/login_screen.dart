@@ -1,6 +1,7 @@
 import 'package:finance_track/providers/login_provider.dart';
 import 'package:finance_track/utils/input_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
 
@@ -114,17 +115,17 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
-                const Text(
+             SizedBox(height: 40.h),
+              Text(
                   'Welcome Back!',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 24.sp,
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 40.h),
                 Form(
                   key: _formKey,
                   child: Column(
@@ -134,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         'Email',
                         style: TextStyle(color: Colors.white),
                       ),
-                      const SizedBox(height: 8),
+                     SizedBox(height: 8.h),
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -153,12 +154,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                       SizedBox(height: 20.h),
                       const Text(
                         'Password',
                         style: TextStyle(color: Colors.white),
                       ),
-                      const SizedBox(height: 8),
+                     SizedBox(height: 8.h),
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscureText,
@@ -193,25 +194,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+              SizedBox(height: 12.h),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
-                    child: const Text(
+                    child:  Text(
                       'Forgot your password?',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(color: Colors.white, fontSize: 14.sp),
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                 SizedBox(height: 8.h),
                 SizedBox(
-                  height: 48,
+                  height: 48.h,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0D3343),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
                     onPressed: _isLoggingIn ? null : _signIn,
@@ -220,17 +221,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? const CircularProgressIndicator(
                               color: Colors.white,
                             )
-                            : const Text(
+                            :  Text(
                               'Sign In',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                   ),
                 ),
-                const SizedBox(height: 30),
+              SizedBox(height: 30.h),
                 Row(
                   children: const [
                     Expanded(child: Divider(color: Colors.white70)),
@@ -241,7 +242,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(child: Divider(color: Colors.white70)),
                   ],
                 ),
-                const SizedBox(height: 20),
+              SizedBox(height: 20.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
