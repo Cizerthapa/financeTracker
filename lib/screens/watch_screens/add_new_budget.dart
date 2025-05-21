@@ -20,16 +20,17 @@ class _AddNewBudgetState extends State<AddNewBudget> {
   }
 
   late WatchConnectivity watchConnectivity;
-@override
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     watchConnectivity = WatchConnectivity();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
+      Provider.of<LoginProvider>(
+        context,
+        listen: false,
+      ).wearOsLogout(watchConnectivity, context);
     });
-
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +72,7 @@ class _AddNewBudgetState extends State<AddNewBudget> {
                           print('Button Pressed');
                         },
                         child: Row(
-                          mainAxisSize:
-                              MainAxisSize.min, // Adjust size based on content
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.tag_rounded,
@@ -96,11 +96,8 @@ class _AddNewBudgetState extends State<AddNewBudget> {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color:
-                                    Colors.white, // Set background color here
-                                borderRadius: BorderRadius.circular(
-                                  5,
-                                ), // Set the border radius here
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5),
                               ),
                               child: SizedBox(
                                 width: 155,
@@ -143,8 +140,7 @@ class _AddNewBudgetState extends State<AddNewBudget> {
                           print('Button Pressed');
                         },
                         child: Row(
-                          mainAxisSize:
-                              MainAxisSize.min, // Adjust size based on content
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Done',

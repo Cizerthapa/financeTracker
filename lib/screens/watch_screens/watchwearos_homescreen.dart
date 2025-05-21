@@ -1,4 +1,3 @@
-
 import 'package:finance_track/providers/notification_provider.dart';
 import 'package:finance_track/screens/watch_screens/addtransaction_or_spendingalerts.dart';
 import 'package:finance_track/screens/watch_screens/spending_alerts.dart';
@@ -89,17 +88,17 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      if(!_isInitialized)
-        {
-          Provider.of<TransactionProvider>(context, listen: false).fetchTransactionsFromFirebase()
-      .then((_) {
-      setState(() {
-      _isLoading = false;
-      _isInitialized = true;
-      });
-      });
-        }
+      if (!_isInitialized) {
+        Provider.of<TransactionProvider>(
+          context,
+          listen: false,
+        ).fetchTransactionsFromFirebase().then((_) {
+          setState(() {
+            _isLoading = false;
+            _isInitialized = true;
+          });
+        });
+      }
 
       // Provider.of<LoginProvider>(context, listen: false).wearOsLogout(watchConnectivity, context);
       //       //
@@ -137,12 +136,12 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionProvider>(context);
     final groupedTx = provider.groupedTransactions;
+
     return Scaffold(
       backgroundColor: Color(0xFF1D85B1),
       body: GestureDetector(
         onPanUpdate: (details) => handleSwipe(context, details),
         child: Stack(
-
           children: [
             Align(
               alignment: Alignment.topLeft,
@@ -150,9 +149,11 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                 width: 165,
                 height: 70,
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(50.0))
+                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(50.0),
+                  ),
                 ),
                 child: Stack(
                   children: [
@@ -165,9 +166,9 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                           Text(
                             'Total Balance',
                             style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.black
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
                             ),
                           ),
                           Text(
@@ -246,12 +247,6 @@ class _WatchwearosHomescreenState extends State<WatchwearosHomescreen> {
                 ),
               ),
             ),
-
-
-
-
-
-
 
             Positioned(
               bottom: -15,

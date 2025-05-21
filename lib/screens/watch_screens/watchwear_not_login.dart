@@ -16,7 +16,6 @@ class _WatchwearNotloginState extends State<WatchwearNotlogin> {
   late WatchConnectivity _watchConnectivity;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _watchConnectivity = WatchConnectivity();

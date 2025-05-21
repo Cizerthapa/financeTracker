@@ -36,8 +36,6 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
              SizedBox(height: 16.h),
-
-              // Profile Picture & Name
               CircleAvatar(
                 radius: 40.r,
                 backgroundImage: NetworkImage(provider_profile.profileImage),
@@ -54,7 +52,6 @@ class ProfilePage extends StatelessWidget {
 
               SizedBox(height: 24.h),
 
-              // Spending Overview Card
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
@@ -103,7 +100,6 @@ class ProfilePage extends StatelessWidget {
                       color: Colors.amberAccent,
                     ),
                     SizedBox(height: 16.h),
-                    // Legend (simplified)
                     Column(
                       children:
                           provider_profile.expenses.entries.map((entry) {
@@ -141,7 +137,6 @@ class ProfilePage extends StatelessWidget {
 
               SizedBox(height: 24.h),
 
-              // Action Buttons
               _buildCardButton(
                 icon: Icons.history,
                 text: 'Transaction History',
@@ -172,7 +167,6 @@ class ProfilePage extends StatelessWidget {
                 iconColor: Colors.red,
                 textColor: Colors.red,
                 onTap: () async {
-
                   WatchConnectivity watchConnectivity = WatchConnectivity();
                   await provider_log.logout(watchConnectivity);
                   Navigator.pushAndRemoveUntil(
@@ -187,7 +181,7 @@ class ProfilePage extends StatelessWidget {
 
              SizedBox(height: 12.h),
               const Text(
-                "Let’s track your expenses.",
+                'Let’s track your expenses.',
                 style: TextStyle(color: Colors.white70),
               ),
             ],

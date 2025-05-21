@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../providers/expense_statistics_provider.dart';
+import '../../utils/budget_notification_service.dart';
 import 'add_budget_page.dart';
 import 'dart:developer';
 
@@ -17,12 +18,33 @@ class ExpenseStatisticsPage extends StatefulWidget {
 
 class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
   DateTime selectedDate = DateTime.now();
+  final Set<String> _notifiedCategories = {}; // ✅ ADDED
 
   @override
   void initState() {
     super.initState();
     log('[initState] Calling fetchBudgets()');
-    context.read<ExpenseStatisticsProvider>().fetchBudgets();
+
+    final provider = context.read<ExpenseStatisticsProvider>();
+    provider.fetchBudgets().then((_) {
+      for (var category in provider.categoryStats) {
+        final title = category['title'] ?? 'Untitled';
+        final spent = (category['spent'] as num?)?.toDouble() ?? 0.0;
+        final budget = (category['budget'] as num?)?.toDouble() ?? 0.0;
+
+        final percentage = budget > 0 ? (spent / budget) * 100 : 0.0;
+
+        if (percentage >= 90 && !_notifiedCategories.contains(title)) {
+          BudgetNotificationService.showNotification(
+            id: title.hashCode,
+            title: 'Budget Alert: $title',
+            body:
+            'You have spent ${percentage.toStringAsFixed(1)}% of your $title budget.',
+          );
+          _notifiedCategories.add(title);
+        }
+      }
+    });
   }
 
   Future<void> _pickMonthYear() async {
@@ -52,24 +74,23 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
   Future<bool> _confirmDelete(BuildContext context, String category) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Confirm Delete'),
-            content: Text('Are you sure you want to delete "$category"?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: Text("Are you sure you want to delete '$category'?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
           ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
     );
 
     if (shouldDelete == true) {
@@ -130,7 +151,7 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
               final totalBudgetSet = snapshot.data ?? 0.0;
               final totalSpend = statsProvider.totalExpenses;
               final progress =
-                  totalBudgetSet > 0 ? totalSpend / totalBudgetSet : 0.0;
+              totalBudgetSet > 0 ? totalSpend / totalBudgetSet : 0.0;
 
               log(
                 '[UI] Total Budget: $totalBudgetSet | Total Spent: $totalSpend | Progress: ${progress * 100}%',
@@ -191,13 +212,12 @@ class _ExpenseStatisticsPageState extends State<ExpenseStatisticsPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => CategoryDetailScreen(
-                                  title: title,
-                                  spent: spent,
-                                  budget: budget,
-                                  percentage: percentage,
-                                ),
+                            builder: (context) => CategoryDetailScreen(
+                              title: title,
+                              spent: spent,
+                              budget: budget,
+                              percentage: percentage,
+                            ),
                           ),
                         );
                       },
